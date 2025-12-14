@@ -1,12 +1,13 @@
 // User & Settings
-export type UserMode = 'maker' | 'dropship';
+// Sellers can do multiple things - this is multi-select during onboarding
+export type SellerType = 'handmade' | 'dropship' | 'print_on_demand' | 'resale';
 
 export type Currency = 'GBP' | 'USD' | 'EUR' | 'CAD' | 'AUD' | 'JPY' | 'CHF' | 'SEK' | 'NOK' | 'DKK';
 
 export interface UserProfile {
   id: string;
   email: string;
-  mode: UserMode;
+  sellerTypes: SellerType[]; // Multi-select: what types of selling do you do?
   country: string;
   currency: Currency;
   vatRegistered: boolean;
@@ -14,6 +15,10 @@ export interface UserProfile {
   defaultHourlyRate: number; // in minor units
   defaultTargetMargin: number; // percentage
   primaryPlatform: PlatformKey;
+  // UI preferences - which features to show in nav
+  showMaterialsLibrary: boolean;
+  showSuppliers: boolean;
+  showTimeTracking: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -66,39 +71,54 @@ export interface LabourTask {
   ratePerHour: number; // in minor units
 }
 
-// Maker product with full cost breakdown
-export interface MakerProduct {
+// Product type discriminator
+export type ProductType = 'handmade' | 'sourced';
+
+// Base product fields shared by all product types
+interface BaseProduct {
   id: string;
   userId: string;
   name: string;
   sku?: string;
-  materials: ProductMaterial[];
-  labourHours?: number;
-  labourRate?: number; // in minor units
-  labourTasks?: LabourTask[];
-  packagingCost: number; // in minor units
   notes?: string;
+  tags?: string[]; // for organization
+  isFavourite: boolean;
   calculatedCost: number; // auto-calculated, in minor units
   createdAt: Date;
   updatedAt: Date;
 }
 
-// Dropship product with simple cost
-export interface DropshipProduct {
-  id: string;
-  userId: string;
-  name: string;
-  sku?: string;
-  supplierId: string;
+// Handmade product: materials + labour + packaging
+export interface HandmadeProduct extends BaseProduct {
+  productType: 'handmade';
+  materials: ProductMaterial[];
+  labourHours?: number;
+  labourRate?: number; // in minor units
+  labourTasks?: LabourTask[];
+  packagingCost: number; // in minor units
+}
+
+// Sourced product: dropship, POD, or resale - simple supplier cost
+export interface SourcedProduct extends BaseProduct {
+  productType: 'sourced';
+  supplierId?: string;
+  supplierName?: string; // for quick entry without creating a supplier
   supplierCost: number; // in minor units
   supplierShippingCost: number; // in minor units
   supplierUrl?: string;
-  notes?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  sourceType: 'dropship' | 'print_on_demand' | 'resale' | 'wholesale';
 }
 
-export type Product = MakerProduct | DropshipProduct;
+export type Product = HandmadeProduct | SourcedProduct;
+
+// Type guard helpers
+export function isHandmadeProduct(product: Product): product is HandmadeProduct {
+  return product.productType === 'handmade';
+}
+
+export function isSourcedProduct(product: Product): product is SourcedProduct {
+  return product.productType === 'sourced';
+}
 
 // Shipping Templates
 export interface ShippingTemplate {

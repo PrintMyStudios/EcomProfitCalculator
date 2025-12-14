@@ -59,22 +59,26 @@ src/
 └── hooks/                    # Custom React hooks
 ```
 
-## User Modes
-Two distinct modes selected during onboarding:
+## Seller Types (Hybrid Support)
+Sellers can do **multiple things** - onboarding is multi-select, not either/or.
 
-### Maker Mode (Handmade/Crafts)
-- Materials library with cost tracking
-- Products built from materials + labour + packaging
-- Time tracking for manufacturing
-- Full cost breakdown
+**Seller Types:**
+- `handmade` - Make products from raw materials
+- `dropship` - Source from suppliers (AliExpress, etc.)
+- `print_on_demand` - Use POD services (Printful, etc.)
+- `resale` - Buy wholesale and resell
 
-### Dropship Mode (Resellers)
-- Supplier management
-- Products with simple supplier cost + shipping
-- No materials, labour, or packaging breakdown
-- Streamlined UI
+**Product Types:**
+- `HandmadeProduct` - Materials + labour + packaging breakdown
+- `SourcedProduct` - Simple supplier cost (dropship, POD, resale, wholesale)
 
-Both modes share: calculator engine, platform fees, VAT, shipping templates, history.
+**Feature Visibility:**
+Based on seller types selected, features auto-show/hide (but can be toggled):
+- Materials Library → shown if `handmade`
+- Suppliers → shown if `dropship` | `print_on_demand` | `resale`
+- Time Tracking → shown if `handmade`
+
+All sellers share: calculator engine, platform fees, VAT, shipping templates, history.
 
 ## Code Style
 - Functional components with hooks only
@@ -178,3 +182,155 @@ Free calculator landing pages at `/calculators/[platform]-fee-calculator`:
 - Bundles feature locked until 2+ products exist
 - Dark mode required throughout
 - Never store monetary values as floats—use minor units (integers)
+
+---
+
+## TODO for George
+
+### Immediate
+- [ ] Create Firebase project at https://console.firebase.google.com
+- [ ] Enable Authentication (Email/Password + Google)
+- [ ] Create Firestore database
+- [ ] Copy Firebase config to `.env.local`
+- [ ] Create Stripe account at https://stripe.com
+- [ ] Set up Stripe products/prices for subscription tiers
+
+### Before Launch
+- [ ] Register domain
+- [ ] Set up Vercel project and connect GitHub repo
+- [ ] Configure custom domain in Vercel
+- [ ] Set up Firebase production environment
+- [ ] Configure Stripe webhook endpoint
+- [ ] Test full signup → subscription flow
+
+### Marketing
+- [ ] Write SEO content for calculator landing pages
+- [ ] Create Open Graph images for social sharing
+- [ ] Set up Google Analytics / Plausible
+- [ ] Plan launch announcement (Reddit, Twitter, Etsy forums)
+
+---
+
+## Claude Code Agents
+
+Use these prompts to run parallel agents for faster development.
+
+### How Agents Work
+- Agents run **independently** in separate contexts
+- They **don't communicate** with each other directly
+- The **main Claude instance coordinates** results
+- Run them in **parallel** when tasks don't depend on each other
+- Each agent sees the full CLAUDE.md for context
+
+### Agent Prompts (copy these to run)
+
+**Agent 1: SEO Landing Page**
+```
+Build the Etsy fee calculator SEO landing page at /calculators/etsy-fee-calculator.
+
+Requirements from CLAUDE.md:
+- SSG page with SEO meta tags and Open Graph
+- Structured data (FAQ schema) for rich snippets
+- Embedded calculator component (no auth required)
+- Inputs: product cost, sale price, shipping
+- Calculate Etsy fees: 6.5% + 4% + £0.20 + £0.15
+- Show: fees breakdown, profit, margin
+- CTA: "Save & compare → Sign up free"
+- Mobile responsive, dark mode support
+- Use shadcn/ui components
+
+Read CLAUDE.md for full context. Use existing /lib/calculations and /lib/constants.
+```
+
+**Agent 2: Auth System**
+```
+Build the authentication system with Firebase.
+
+Requirements:
+- /login page with email + Google sign-in
+- /signup page with email + Google
+- /forgot-password page
+- useAuth hook (already scaffolded in /hooks/use-auth.ts)
+- Protected route wrapper component
+- Redirect unauthenticated users to /login
+- After login, redirect to /app/dashboard
+
+Use Firebase Auth from /lib/firebase. Use shadcn/ui for forms.
+Read CLAUDE.md for full context.
+```
+
+**Agent 3: Onboarding Wizard**
+```
+Build the onboarding wizard shown after first signup.
+
+Steps:
+1. "What do you sell?" - Multi-select: Handmade, Dropship, Print-on-Demand, Resale
+2. Country selection (dropdown)
+3. "Are you VAT registered?" - Yes / No / Not sure
+4. Primary marketplace - Etsy, eBay, Amazon, Shopify, TikTok
+5. Currency (auto-suggested from country)
+
+Save to Firestore under users/{userId}/profile.
+Update Zustand store (src/stores/settings.ts).
+Use shadcn/ui components, add step indicator.
+Read CLAUDE.md for full context.
+```
+
+**Agent 4: App Shell & Navigation**
+```
+Build the main app shell layout for /app/* routes.
+
+Requirements:
+- Sidebar navigation (collapsible on mobile)
+- Nav items: Dashboard, Calculator, Products, Materials*, Suppliers*, Shipping, Platforms, History, Settings
+- Items marked * should show/hide based on user's sellerTypes (from settings store)
+- Dark mode toggle in header
+- User avatar/menu with logout
+- Breadcrumb support
+- Mobile-friendly hamburger menu
+
+Use shadcn/ui sidebar component. Read settings from Zustand store.
+Read CLAUDE.md for full context.
+```
+
+**Agent 5: Calculator Core**
+```
+Build the main calculator page at /app/calculator.
+
+Requirements:
+- Product selector (or manual cost entry)
+- Sale price input with currency formatting
+- Shipping cost input (toggle: seller pays / buyer pays)
+- Platform selector (Etsy, eBay, etc.)
+- Quantity input
+- Results panel showing:
+  - Fees breakdown (itemized)
+  - Profit (in currency)
+  - Margin (percentage)
+  - Break-even price
+  - Target price (for X% margin)
+- Rounding options (.99, .50, .00)
+- "Save calculation" button
+
+Use /lib/calculations for all math. Use shadcn/ui.
+Read CLAUDE.md for full context.
+```
+
+**Agent 6: Product Management**
+```
+Build product management at /app/products.
+
+Requirements:
+- List view with search/filter
+- Two product types (see types/index.ts):
+  - HandmadeProduct: materials + labour + packaging
+  - SourcedProduct: supplier cost + shipping
+- Create/Edit forms for each type
+- Product cost auto-calculates
+- Save to Firestore under users/{userId}/products
+- Delete with confirmation
+- Favourite toggle
+
+Use shadcn/ui data table, forms, dialogs.
+Read CLAUDE.md for full context.
+```
