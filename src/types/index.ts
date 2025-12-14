@@ -19,6 +19,8 @@ export interface UserProfile {
   showMaterialsLibrary: boolean;
   showSuppliers: boolean;
   showTimeTracking: boolean;
+  // Onboarding status
+  onboardingCompleted: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
