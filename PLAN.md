@@ -1,12 +1,12 @@
 # PLAN.md - EcomProfitCalculator
 
 ## Current Focus
-M2 - Auth + Onboarding Wizard
+M3 - Core Calculator (Both Product Types)
 
 ## Milestones
 - [x] M0 - Project setup ✅
 - [x] M1 - Free Etsy calculator (SEO landing page) ✅
-- [ ] M2 - Auth + onboarding wizard
+- [x] M2 - Auth + onboarding wizard ✅
 - [ ] M3 - Core calculator (both product types)
 - [ ] M4 - Product management
 - [ ] M5 - Platform & shipping templates
@@ -57,23 +57,25 @@ M2 - Auth + Onboarding Wizard
 
 ---
 
-## M2 - Auth + Onboarding Wizard
+## M2 - Auth + Onboarding Wizard ✅ COMPLETE
 **Goal:** Users can create accounts and configure their seller profile.
 
 **Done when:**
-- [ ] Firebase Auth integrated (email + Google)
-- [ ] `/login`, `/signup`, `/forgot-password` pages
-- [ ] Protected routes redirect unauthenticated users
-- [ ] Onboarding wizard after first signup:
-  - [ ] "What do you sell?" → Multi-select: Handmade, Dropship, Print-on-Demand, Resale
-  - [ ] Country selection
-  - [ ] VAT registered? (Yes/No/Not sure)
-  - [ ] Primary marketplace (Etsy, eBay, Amazon, Shopify, TikTok)
-  - [ ] Currency (auto-suggested from country)
-- [ ] User profile saved to Firestore
-- [ ] Feature visibility auto-configured based on seller types
-- [ ] App layout with navigation (shows/hides features based on profile)
-- [ ] Logout functionality
+- [x] Firebase Auth integrated (email + Google)
+- [x] `/login`, `/signup`, `/forgot-password` pages
+- [x] Protected routes redirect unauthenticated users
+- [x] Onboarding wizard after first signup:
+  - [x] "What do you sell?" → Multi-select: Handmade, Dropship, Print-on-Demand, Resale
+  - [x] Country selection (15 countries)
+  - [x] VAT registered? (Yes/No/Not sure)
+  - [x] Primary marketplace (Etsy, eBay, Amazon, Shopify, TikTok)
+  - [x] Currency (auto-suggested from country)
+- [x] User profile saved to Firestore
+- [x] Feature visibility auto-configured based on seller types
+- [x] App layout with responsive sidebar navigation
+- [x] Mobile hamburger menu
+- [x] User dropdown with logout
+- [x] Dashboard with quick actions and getting started guide
 
 ---
 
