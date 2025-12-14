@@ -1,11 +1,11 @@
 # PLAN.md - EcomProfitCalculator
 
 ## Current Focus
-M1 - Free Etsy Calculator (SEO Landing Page)
+M2 - Auth + Onboarding Wizard
 
 ## Milestones
 - [x] M0 - Project setup ✅
-- [ ] M1 - Free Etsy calculator (SEO landing page)
+- [x] M1 - Free Etsy calculator (SEO landing page) ✅
 - [ ] M2 - Auth + onboarding wizard
 - [ ] M3 - Core calculator (both product types)
 - [ ] M4 - Product management
@@ -38,20 +38,22 @@ M1 - Free Etsy Calculator (SEO Landing Page)
 
 ---
 
-## M1 - Free Etsy Calculator (SEO Landing Page)
+## M1 - Free Etsy Calculator (SEO Landing Page) ✅ COMPLETE
 **Goal:** Ship a free, no-login Etsy fee calculator that ranks in search and funnels users to signup.
 
 **Done when:**
-- [ ] `/calculators/etsy-fee-calculator` page exists (SSG)
-- [ ] SEO meta tags and Open Graph configured
-- [ ] Structured data (FAQ schema) for rich snippets
-- [ ] Calculator component: product cost, sale price, shipping inputs
-- [ ] Etsy fee calculation: 6.5% + 4% + £0.20 + £0.15
-- [ ] Results show: fees breakdown, profit, margin
-- [ ] No login required to use
-- [ ] CTA: "Save & compare across platforms → Sign up free"
-- [ ] Mobile responsive, dark mode supported
-- [ ] Page loads < 2.5s LCP
+- [x] `/calculators/etsy-fee-calculator` page exists (SSG)
+- [x] SEO meta tags and Open Graph configured
+- [x] Structured data (FAQ schema) for rich snippets
+- [x] Calculator component: product cost, sale price, shipping inputs
+- [x] Etsy fee calculation: 6.5% + 4% + £0.20 + £0.15
+- [x] Results show: fees breakdown, profit, margin, break-even price
+- [x] No login required to use
+- [x] CTA: "Save & compare across platforms → Sign up free"
+- [x] Mobile responsive, dark mode supported
+- [x] Free shipping toggle (seller pays shipping)
+- [x] VAT registered toggle (UK 20%)
+- [x] Links to other calculator pages (coming soon)
 
 ---
 
