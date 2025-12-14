@@ -1,13 +1,13 @@
 # PLAN.md - EcomProfitCalculator
 
 ## Current Focus
-M0 - Project Setup
+M1 - Free Etsy Calculator (SEO Landing Page)
 
 ## Milestones
-- [ ] M0 - Project setup
+- [x] M0 - Project setup ✅
 - [ ] M1 - Free Etsy calculator (SEO landing page)
 - [ ] M2 - Auth + onboarding wizard
-- [ ] M3 - Core calculator (both modes)
+- [ ] M3 - Core calculator (both product types)
 - [ ] M4 - Product management
 - [ ] M5 - Platform & shipping templates
 - [ ] M6 - Comparison, history, dashboard
@@ -16,19 +16,25 @@ M0 - Project Setup
 
 ---
 
-## M0 - Project Setup
+## M0 - Project Setup ✅ COMPLETE
 **Goal:** Scaffold the project with all core dependencies and folder structure.
 
 **Done when:**
-- [ ] Next.js 14 with App Router initialized
-- [ ] TypeScript configured strictly
-- [ ] Tailwind CSS installed and configured
-- [ ] shadcn/ui initialized with base components
-- [ ] Firebase project created and config added
-- [ ] Folder structure matches CLAUDE.md spec
-- [ ] Git initialized with .gitignore
-- [ ] ESLint + Prettier configured
-- [ ] `npm run dev` works
+- [x] Next.js 14 with App Router initialized
+- [x] TypeScript configured strictly
+- [x] Tailwind CSS v4 installed and configured
+- [x] shadcn/ui initialized with base components (button, input, card)
+- [x] Firebase config scaffolded (needs credentials in .env.local)
+- [x] Folder structure matches CLAUDE.md spec
+- [x] Git initialized and pushed to GitHub
+- [x] ESLint configured
+- [x] `npm run dev` works
+- [x] Core calculation library (fees, profit, rounding)
+- [x] Type definitions for all entities
+- [x] Platform fee constants (Etsy, eBay, Amazon, Shopify, TikTok)
+- [x] Currency constants with VAT rates (10 currencies)
+- [x] Zustand settings store with hybrid seller support
+- [x] useAuth hook scaffolded
 
 ---
 
@@ -57,25 +63,27 @@ M0 - Project Setup
 - [ ] `/login`, `/signup`, `/forgot-password` pages
 - [ ] Protected routes redirect unauthenticated users
 - [ ] Onboarding wizard after first signup:
-  - [ ] "What type of seller?" → Maker / Dropshipper
+  - [ ] "What do you sell?" → Multi-select: Handmade, Dropship, Print-on-Demand, Resale
   - [ ] Country selection
   - [ ] VAT registered? (Yes/No/Not sure)
-  - [ ] Primary marketplace
-  - [ ] Currency
+  - [ ] Primary marketplace (Etsy, eBay, Amazon, Shopify, TikTok)
+  - [ ] Currency (auto-suggested from country)
 - [ ] User profile saved to Firestore
-- [ ] App layout with navigation (mode-aware)
+- [ ] Feature visibility auto-configured based on seller types
+- [ ] App layout with navigation (shows/hides features based on profile)
 - [ ] Logout functionality
 
 ---
 
-## M3 - Core Calculator (Both Modes)
+## M3 - Core Calculator (Both Product Types)
 **Goal:** Full calculator with fee calculations, VAT handling, and margin analysis.
 
 **Done when:**
 - [ ] Calculator page at `/app/calculator`
 - [ ] Product cost input:
-  - [ ] Maker: materials + labour + packaging breakdown
-  - [ ] Dropship: supplier cost + shipping (simple)
+  - [ ] HandmadeProduct: materials + labour + packaging breakdown
+  - [ ] SourcedProduct: supplier cost + shipping (simple)
+  - [ ] Or manual cost entry without saved product
 - [ ] Sale price input with currency formatting
 - [ ] Shipping cost input (seller-paid vs buyer-paid toggle)
 - [ ] Platform selector (Etsy, eBay, Amazon, Shopify, TikTok)
@@ -97,20 +105,22 @@ M0 - Project Setup
 **Goal:** Users can save products/materials/suppliers and reuse them in calculations.
 
 **Done when:**
-- [ ] **Maker Mode:**
-  - [ ] Materials library CRUD
-  - [ ] Material: name, unit, cost, supplier, category, notes
-  - [ ] Products CRUD
-  - [ ] Product: name, materials list with quantities, labour, packaging
-  - [ ] Auto-calculate product cost from components
-- [ ] **Dropship Mode:**
+- [ ] **Materials Library** (for handmade sellers):
+  - [ ] Materials CRUD
+  - [ ] Material: name, unit, cost, supplier, category, notes, cost history
+  - [ ] Favourite and usage count tracking
+- [ ] **Suppliers** (for sourced products):
   - [ ] Suppliers CRUD
-  - [ ] Supplier: name, platform, currency, website, notes
-  - [ ] Products CRUD (simplified)
-  - [ ] Product: name, supplier, cost, shipping cost
+  - [ ] Supplier: name, platform (AliExpress, Printful, etc.), currency, website, notes
+- [ ] **Products** (unified, two types):
+  - [ ] Products list with type filter (Handmade / Sourced)
+  - [ ] HandmadeProduct: name, materials + quantities, labour, packaging
+  - [ ] SourcedProduct: name, supplier, cost, shipping, source type (dropship/POD/resale/wholesale)
+  - [ ] Auto-calculate product cost
+  - [ ] Tags and favourites
 - [ ] All data persisted to Firestore
 - [ ] Select saved product in calculator
-- [ ] Material cost changes propagate to products
+- [ ] Material cost changes propagate to handmade products
 - [ ] Empty states guide user through workflow
 
 ---
