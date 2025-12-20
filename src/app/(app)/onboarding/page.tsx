@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { toast } from 'sonner';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/components/auth/auth-provider';
 import { Button } from '@/components/ui/button';
@@ -135,10 +136,7 @@ export default function OnboardingPage() {
 
       // Determine feature visibility based on seller types
       const hasHandmade = sellerTypes.includes('handmade');
-      const hasSourced =
-        sellerTypes.includes('dropship') ||
-        sellerTypes.includes('print_on_demand') ||
-        sellerTypes.includes('resale');
+      // Suppliers are shown for ALL seller types - everyone buys from suppliers
 
       // Update user profile in Firestore
       await updateDoc(doc(db, 'users', user.uid), {
@@ -150,7 +148,7 @@ export default function OnboardingPage() {
         defaultHourlyRate: 1500, // £15.00 default
         defaultTargetMargin: 30, // 30% default
         showMaterialsLibrary: hasHandmade,
-        showSuppliers: hasSourced,
+        showSuppliers: true, // Always show suppliers
         showTimeTracking: hasHandmade,
         onboardingCompleted: true,
         updatedAt: serverTimestamp(),
@@ -159,11 +157,15 @@ export default function OnboardingPage() {
       // Refresh the user profile in context
       await refreshUserProfile();
 
-      // Redirect to dashboard
+      // Show success toast and redirect to dashboard
+      toast.success('Setup complete!', {
+        description: "Let's start calculating your profits",
+      });
       router.push('/dashboard');
     } catch (err) {
       console.error('Error saving profile:', err);
       setError('Failed to save your profile. Please try again.');
+      toast.error('Failed to save profile');
     } finally {
       setLoading(false);
     }

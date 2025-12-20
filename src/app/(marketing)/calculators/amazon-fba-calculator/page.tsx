@@ -93,82 +93,125 @@ export default function AmazonFbaCalculatorPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }}
       />
 
-      <div className="container mx-auto px-4 py-8 md:py-12">
-        {/* Hero section */}
-        <div className="mx-auto max-w-3xl text-center">
-          <h1 className="text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
-            Free Amazon FBA Fee Calculator
-          </h1>
-          <p className="mt-4 text-lg text-muted-foreground md:text-xl">
-            Calculate your Amazon FBA fees, profit, and margins instantly.
-            <br className="hidden sm:inline" />
-            See exactly how much you keep after all fees.
-          </p>
-        </div>
+      {/* Hero section with gradient */}
+      <section className="relative overflow-hidden border-b">
+        {/* Decorative gradient orb */}
+        <div className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-amber-500/20 to-orange-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-tr from-orange-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
 
+        <div className="relative container mx-auto px-4 py-12 md:py-16">
+          <div className="mx-auto max-w-3xl text-center">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium mb-4">
+              Amazon FBA Calculator
+            </span>
+            <h1 className="text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
+              Calculate Your{' '}
+              <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
+                Amazon Profits
+              </span>
+            </h1>
+            <p className="mt-4 text-lg text-muted-foreground md:text-xl">
+              Calculate your Amazon FBA fees, profit, and margins instantly.
+              <br className="hidden sm:inline" />
+              See exactly how much you keep after all fees.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div className="container mx-auto px-4 py-8 md:py-12">
         {/* Calculator */}
-        <div className="mx-auto mt-8 max-w-4xl md:mt-12">
+        <div className="mx-auto max-w-4xl">
           <AmazonCalculator />
         </div>
 
-        {/* CTA */}
-        <div className="mx-auto mt-12 max-w-2xl rounded-lg border bg-muted/50 p-6 text-center md:p-8">
-          <h2 className="text-xl font-semibold md:text-2xl">
-            Want to save calculations &amp; compare platforms?
-          </h2>
-          <p className="mt-2 text-muted-foreground">
-            Create a free account to save your products, compare fees across Amazon, Etsy, eBay,
-            and more.
-          </p>
-          <a
-            href="/signup"
-            className="mt-4 inline-flex h-10 items-center justify-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-          >
-            Sign Up Free
-          </a>
+        {/* CTA with gradient border */}
+        <div className="mx-auto mt-12 max-w-2xl">
+          <div className="relative group">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl opacity-50 group-hover:opacity-75 blur-sm transition-opacity" />
+            <div className="relative rounded-lg bg-card p-6 text-center md:p-8">
+              <h2 className="text-xl font-semibold md:text-2xl">
+                Want to save calculations &amp; compare platforms?
+              </h2>
+              <p className="mt-2 text-muted-foreground">
+                Create a free account to save your products, compare fees across Amazon, Etsy, eBay,
+                and more.
+              </p>
+              <a
+                href="/signup"
+                className="mt-4 inline-flex h-10 items-center justify-center rounded-md bg-gradient-to-r from-amber-500 to-orange-500 px-6 text-sm font-medium text-white hover:from-amber-600 hover:to-orange-600 shadow-lg shadow-amber-500/25 transition-all"
+              >
+                Sign Up Free
+              </a>
+            </div>
+          </div>
         </div>
 
         {/* How Amazon FBA Fees Work */}
         <div className="mx-auto mt-16 max-w-3xl">
-          <h2 className="text-2xl font-bold md:text-3xl">How Amazon FBA Fees Work in 2025</h2>
-          <div className="mt-6 space-y-6 text-muted-foreground">
+          <h2 className="text-2xl font-bold md:text-3xl">
+            How <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Amazon FBA Fees</span> Work in 2025
+          </h2>
+          <div className="mt-6 space-y-4 text-muted-foreground">
             <p>
               Understanding Amazon&apos;s fee structure is essential for pricing your products
               profitably. Here&apos;s a complete breakdown of what Amazon charges FBA sellers:
             </p>
 
-            <div className="rounded-lg border p-4">
-              <h3 className="font-semibold text-foreground">Referral Fee: 15%</h3>
-              <p className="mt-1 text-sm">
-                Charged on the item price (not shipping). This is Amazon&apos;s commission for
-                selling on their marketplace. Most categories are 15%, but some vary from 6% to
-                45%.
-              </p>
+            <div className="rounded-xl border bg-card/50 backdrop-blur-sm p-4 transition-all hover:shadow-md hover:border-amber-500/30">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center">
+                  <span className="text-amber-600 dark:text-amber-400 font-bold">%</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">Referral Fee: 15%</h3>
+                  <p className="text-sm">
+                    Charged on the item price (not shipping). Most categories are 15%, but some vary from 6% to 45%.
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div className="rounded-lg border p-4">
-              <h3 className="font-semibold text-foreground">FBA Fulfillment Fees</h3>
-              <p className="mt-1 text-sm">
-                Amazon picks, packs, and ships your products. Fees vary by size and weight. Small
-                standard items start around £2.50, while large items can cost £5+ per unit.
-              </p>
+            <div className="rounded-xl border bg-card/50 backdrop-blur-sm p-4 transition-all hover:shadow-md hover:border-amber-500/30">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center">
+                  <span className="text-amber-600 dark:text-amber-400 font-bold">📦</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">FBA Fulfillment Fees</h3>
+                  <p className="text-sm">
+                    Amazon picks, packs, and ships your products. Fees vary by size and weight (£2.50-£5+).
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div className="rounded-lg border p-4">
-              <h3 className="font-semibold text-foreground">Monthly Storage Fees</h3>
-              <p className="mt-1 text-sm">
-                Charged per cubic foot per month. Standard storage is approximately £0.70/cubic
-                foot (January-September) and £1.40/cubic foot (October-December).
-              </p>
+            <div className="rounded-xl border bg-card/50 backdrop-blur-sm p-4 transition-all hover:shadow-md hover:border-amber-500/30">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center">
+                  <span className="text-amber-600 dark:text-amber-400 font-bold">🏪</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">Monthly Storage Fees</h3>
+                  <p className="text-sm">
+                    £0.70/cubic foot (Jan-Sep) and £1.40/cubic foot (Oct-Dec). Higher fees during peak season.
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div className="rounded-lg border p-4">
-              <h3 className="font-semibold text-foreground">Optional Fees</h3>
-              <p className="mt-1 text-sm">
-                Additional services include inventory removal (£0.50-£0.80 per item), labeling
-                (£0.15-£0.30 per item), and long-term storage (£6.90 per cubic foot after 365
-                days).
-              </p>
+            <div className="rounded-xl border bg-card/50 backdrop-blur-sm p-4 transition-all hover:shadow-md hover:border-amber-500/30">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center">
+                  <span className="text-amber-600 dark:text-amber-400 font-bold">+</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">Optional Fees</h3>
+                  <p className="text-sm">
+                    Inventory removal (£0.50-£0.80), labeling (£0.15-£0.30), long-term storage (£6.90/cubic foot).
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -183,7 +226,7 @@ export default function AmazonFbaCalculatorPage() {
             </p>
 
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="rounded-lg border p-4">
+              <div className="rounded-xl border bg-card/50 backdrop-blur-sm p-4 transition-all hover:shadow-md">
                 <h3 className="font-semibold text-foreground">Fulfillment by Amazon (FBA)</h3>
                 <ul className="mt-2 space-y-1 text-sm">
                   <li>• Prime eligibility increases sales</li>
@@ -193,7 +236,7 @@ export default function AmazonFbaCalculatorPage() {
                 </ul>
               </div>
 
-              <div className="rounded-lg border p-4">
+              <div className="rounded-xl border bg-card/50 backdrop-blur-sm p-4 transition-all hover:shadow-md">
                 <h3 className="font-semibold text-foreground">Fulfillment by Merchant (FBM)</h3>
                 <ul className="mt-2 space-y-1 text-sm">
                   <li>• You handle storage and shipping</li>
@@ -209,9 +252,9 @@ export default function AmazonFbaCalculatorPage() {
         {/* FAQ Section */}
         <div className="mx-auto mt-16 max-w-3xl">
           <h2 className="text-2xl font-bold md:text-3xl">Frequently Asked Questions</h2>
-          <div className="mt-6 space-y-6">
+          <div className="mt-6 space-y-4">
             {faqStructuredData.mainEntity.map((faq, index) => (
-              <div key={index} className="rounded-lg border p-4">
+              <div key={index} className="rounded-xl border bg-card/50 backdrop-blur-sm p-4 transition-all hover:shadow-md">
                 <h3 className="font-semibold">{faq.name}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">
                   {faq.acceptedAnswer.text}
@@ -230,33 +273,37 @@ export default function AmazonFbaCalculatorPage() {
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <a
               href="/calculators/etsy-fee-calculator"
-              className="rounded-lg border p-4 hover:border-primary hover:bg-muted/50"
+              className="group relative overflow-hidden rounded-xl border bg-card/50 backdrop-blur-sm p-4 transition-all hover:-translate-y-1 hover:shadow-lg"
             >
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 to-amber-500" />
               <span className="font-semibold">Etsy Fee Calculator</span>
               <span className="mt-1 block text-sm text-muted-foreground">
-                Calculate Etsy fees (6.5% + 4% + £0.35)
+                Calculate Etsy fees and profit
               </span>
             </a>
             <a
               href="/calculators/ebay-fee-calculator"
-              className="rounded-lg border p-4 hover:border-primary hover:bg-muted/50"
+              className="group relative overflow-hidden rounded-xl border bg-card/50 backdrop-blur-sm p-4 transition-all hover:-translate-y-1 hover:shadow-lg"
             >
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500" />
               <span className="font-semibold">eBay Fee Calculator</span>
-              <span className="mt-1 block text-sm text-muted-foreground">Coming soon</span>
+              <span className="mt-1 block text-sm text-muted-foreground">Calculate eBay fees and profit</span>
             </a>
             <a
               href="/calculators/shopify-profit-calculator"
-              className="rounded-lg border p-4 hover:border-primary hover:bg-muted/50"
+              className="group relative overflow-hidden rounded-xl border bg-card/50 backdrop-blur-sm p-4 transition-all hover:-translate-y-1 hover:shadow-lg"
             >
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-500 to-emerald-500" />
               <span className="font-semibold">Shopify Profit Calculator</span>
-              <span className="mt-1 block text-sm text-muted-foreground">Coming soon</span>
+              <span className="mt-1 block text-sm text-muted-foreground">Calculate Shopify fees and profit</span>
             </a>
             <a
               href="/calculators/tiktok-shop-calculator"
-              className="rounded-lg border p-4 hover:border-primary hover:bg-muted/50"
+              className="group relative overflow-hidden rounded-xl border bg-card/50 backdrop-blur-sm p-4 transition-all hover:-translate-y-1 hover:shadow-lg"
             >
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-pink-500 to-red-500" />
               <span className="font-semibold">TikTok Shop Calculator</span>
-              <span className="mt-1 block text-sm text-muted-foreground">Coming soon</span>
+              <span className="mt-1 block text-sm text-muted-foreground">Calculate TikTok Shop fees and profit</span>
             </a>
           </div>
         </div>

@@ -133,3 +133,10 @@ export function toMajorUnits(minorUnits: number, currency: Currency): number {
   const config = CURRENCIES[currency];
   return minorUnits / Math.pow(10, config.decimalPlaces);
 }
+
+/**
+ * Get the symbol for a currency (for input prefixes)
+ */
+export function getCurrencySymbol(currency: Currency): string {
+  return CURRENCIES[currency].symbol;
+}

@@ -160,13 +160,23 @@ M4 - Product Management
 **Goal:** Users can save products/materials/suppliers and reuse them in calculations.
 
 **Done when:**
-- [ ] **Materials Library** (for handmade sellers):
-  - [ ] Materials CRUD
-  - [ ] Material: name, unit, cost, supplier, category, notes, cost history
-  - [ ] Favourite and usage count tracking
-- [ ] **Suppliers** (for sourced products):
-  - [ ] Suppliers CRUD
-  - [ ] Supplier: name, platform (AliExpress, Printful, etc.), currency, website, notes
+- [x] **Materials Library** (for handmade sellers):
+  - [x] Materials CRUD with real-time Firebase sync
+  - [x] Material: name, unit, cost, supplier links (many-to-many), category, notes, cost history
+  - [x] Favourite and usage count tracking
+  - [x] Multi-supplier linking with cost, SKU, quality rating, stock status per link
+  - [x] Preferred supplier designation (auto-updates material cost)
+  - [x] Quick-add supplier from material card (hover action)
+  - [x] Stock status badges and warnings on cards
+  - [x] Search, filter by category, sort by name/cost/recent
+- [x] **Suppliers** (unified for ALL seller types):
+  - [x] Suppliers CRUD with real-time Firebase sync
+  - [x] Unified Supplier entity with type: materials / products / both
+  - [x] Core fields: name, type, currency, website, notes, contact info
+  - [x] Materials supplier fields: account number, lead time, min order value
+  - [x] Products supplier fields: platform, ships from, shipping/processing time, returns handling
+  - [x] Type filter, platform filter, favourites, search
+  - [x] Suppliers visible for ALL seller types (not just dropshippers)
 - [ ] **Products** (unified, two types):
   - [ ] Products list with type filter (Handmade / Sourced)
   - [ ] HandmadeProduct: name, materials + quantities, labour, packaging
@@ -184,6 +194,29 @@ M4 - Product Management
 - [ ] Select saved product in calculator
 - [ ] Material cost changes propagate to handmade products
 - [ ] Empty states guide user through workflow
+
+**Files Created (Materials & Suppliers):**
+- `src/app/(app)/materials/page.tsx`
+- `src/app/(app)/suppliers/page.tsx`
+- `src/components/materials/material-form.tsx`
+- `src/components/materials/material-card.tsx`
+- `src/components/materials/supplier-link-card.tsx`
+- `src/components/materials/add-supplier-link-dialog.tsx`
+- `src/components/materials/material-suppliers-section.tsx`
+- `src/components/suppliers/supplier-form.tsx`
+- `src/components/suppliers/supplier-card.tsx`
+- `src/lib/firebase/materials.ts`
+- `src/lib/firebase/suppliers.ts`
+- `src/lib/validations/material.ts`
+- `src/lib/validations/supplier.ts`
+- `src/lib/validations/material-supplier-link.ts`
+- `src/hooks/use-materials.ts`
+- `src/hooks/use-suppliers.ts`
+- `src/components/ui/dialog.tsx`
+- `src/components/ui/alert-dialog.tsx`
+- `src/components/ui/textarea.tsx`
+- `src/components/ui/sonner.tsx`
+- `src/components/ui/tooltip.tsx`
 
 ---
 
@@ -403,3 +436,13 @@ Ideas for future versions:
 **Problem:** Fixed shipping costs are inaccurate; actual costs depend on weight and destination.
 **Solution:** Weight bands with min/max ranges and carrier profiles. Calculate shipping from product weight automatically.
 **Benefit:** More accurate profit calculations, especially for heavy or light items.
+
+### Unified Supplier System
+**Problem:** Suppliers were only shown for dropshippers, but handmade sellers also buy from suppliers (materials). Users wanted to track multiple suppliers per material with different prices/quality/stock status.
+**Solution:** Unified Supplier entity that works for ALL seller types with conditional fields based on type (materials/products/both). Materials link to multiple suppliers via MaterialSupplierLink with per-link cost, SKU, quality rating, and stock status.
+**Benefit:** One supplier management system for all seller types. Materials can have multiple supplier options with "preferred" designation. Stock status warnings help identify supply chain issues.
+
+### Material-Supplier Links (Many-to-Many)
+**Problem:** Users source the same material from multiple suppliers with different prices and availability.
+**Solution:** Embedded `supplierLinks` array on Material with denormalized supplier name, per-link cost, SKU, quality rating (1-5), stock status, and cost history.
+**Benefit:** Quick comparison of supplier options, preferred supplier auto-updates material cost, stock warnings surface on material cards.

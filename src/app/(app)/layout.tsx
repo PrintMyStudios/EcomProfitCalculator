@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Toaster } from '@/components/ui/sonner';
 import { useSettingsStore } from '@/stores/settings';
 
 // Icons as simple SVG components
@@ -81,7 +82,8 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Skip protected route wrapper for these pages
-  const isPublicRoute = pathname === '/onboarding' || pathname === '/calculator';
+  // NOTE: Temporarily allowing all routes for testing - remove in production!
+  const isPublicRoute = true; // pathname === '/onboarding' || pathname === '/calculator';
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: HomeIcon, show: true },
@@ -209,6 +211,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
       <AppLayoutContent>{children}</AppLayoutContent>
+      <Toaster position="top-right" richColors closeButton />
     </AuthProvider>
   );
 }

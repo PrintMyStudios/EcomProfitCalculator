@@ -60,11 +60,11 @@ export const useSettingsStore = create<SettingsState>()(
       setSellerTypes: (types) => {
         // Auto-configure feature visibility based on seller types
         const hasHandmade = types.includes('handmade');
-        const hasSourced = types.includes('dropship') || types.includes('print_on_demand') || types.includes('resale');
+        // Suppliers are shown for ALL seller types - everyone buys from suppliers
         set({
           sellerTypes: types,
           showMaterialsLibrary: hasHandmade,
-          showSuppliers: hasSourced,
+          showSuppliers: true, // Always show suppliers
           showTimeTracking: hasHandmade,
         });
       },

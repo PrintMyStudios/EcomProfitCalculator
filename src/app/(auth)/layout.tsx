@@ -1,6 +1,7 @@
 'use client';
 
 import { AuthProvider } from '@/components/auth/auth-provider';
+import { Toaster } from '@/components/ui/sonner';
 
 export default function AuthLayout({
   children,
@@ -19,6 +20,7 @@ export default function AuthLayout({
           {children}
         </div>
       </div>
+      <Toaster position="top-right" richColors closeButton />
     </AuthProvider>
   );
 }

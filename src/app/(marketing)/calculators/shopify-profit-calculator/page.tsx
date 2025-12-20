@@ -91,84 +91,115 @@ export default function ShopifyProfitCalculatorPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }}
       />
 
-      <div className="container mx-auto px-4 py-8 md:py-12">
-        {/* Hero section */}
-        <div className="mx-auto max-w-3xl text-center">
-          <h1 className="text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
-            Free Shopify Profit Calculator
-          </h1>
-          <p className="mt-4 text-lg text-muted-foreground md:text-xl">
-            Calculate your Shopify fees, profit, and margins instantly.
-            <br className="hidden sm:inline" />
-            See exactly how much you keep after all fees.
-          </p>
-        </div>
+      {/* Hero section with gradient */}
+      <section className="relative overflow-hidden border-b">
+        {/* Decorative gradient orb */}
+        <div className="absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-green-500/20 to-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-tr from-green-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
 
+        <div className="relative container mx-auto px-4 py-12 md:py-16">
+          <div className="mx-auto max-w-3xl text-center">
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-medium mb-4">
+              Shopify Profit Calculator
+            </span>
+            <h1 className="text-3xl font-bold tracking-tight md:text-4xl lg:text-5xl">
+              Calculate Your{' '}
+              <span className="bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">
+                Shopify Profits
+              </span>
+            </h1>
+            <p className="mt-4 text-lg text-muted-foreground md:text-xl">
+              Calculate your Shopify fees, profit, and margins instantly.
+              <br className="hidden sm:inline" />
+              See exactly how much you keep after all fees.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div className="container mx-auto px-4 py-8 md:py-12">
         {/* Calculator */}
-        <div className="mx-auto mt-8 max-w-4xl md:mt-12">
+        <div className="mx-auto max-w-4xl">
           <ShopifyCalculator />
         </div>
 
-        {/* CTA */}
-        <div className="mx-auto mt-12 max-w-2xl rounded-lg border bg-muted/50 p-6 text-center md:p-8">
-          <h2 className="text-xl font-semibold md:text-2xl">
-            Want to save calculations &amp; compare platforms?
-          </h2>
-          <p className="mt-2 text-muted-foreground">
-            Create a free account to save your products, compare fees across Shopify, Etsy, eBay,
-            Amazon, and more.
-          </p>
-          <a
-            href="/signup"
-            className="mt-4 inline-flex h-10 items-center justify-center rounded-md bg-primary px-6 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-          >
-            Sign Up Free
-          </a>
+        {/* CTA with gradient border */}
+        <div className="mx-auto mt-12 max-w-2xl">
+          <div className="relative group">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl opacity-50 group-hover:opacity-75 blur-sm transition-opacity" />
+            <div className="relative rounded-lg bg-card p-6 text-center md:p-8">
+              <h2 className="text-xl font-semibold md:text-2xl">
+                Want to save calculations &amp; compare platforms?
+              </h2>
+              <p className="mt-2 text-muted-foreground">
+                Create a free account to save your products, compare fees across Shopify, Etsy, eBay,
+                Amazon, and more.
+              </p>
+              <a
+                href="/signup"
+                className="mt-4 inline-flex h-10 items-center justify-center rounded-md bg-gradient-to-r from-green-500 to-emerald-500 px-6 text-sm font-medium text-white hover:from-green-600 hover:to-emerald-600 shadow-lg shadow-green-500/25 transition-all"
+              >
+                Sign Up Free
+              </a>
+            </div>
+          </div>
         </div>
 
         {/* How Shopify Fees Work */}
         <div className="mx-auto mt-16 max-w-3xl">
-          <h2 className="text-2xl font-bold md:text-3xl">How Shopify Fees Work in 2025</h2>
-          <div className="mt-6 space-y-6 text-muted-foreground">
+          <h2 className="text-2xl font-bold md:text-3xl">
+            How <span className="bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">Shopify Fees</span> Work in 2025
+          </h2>
+          <div className="mt-6 space-y-4 text-muted-foreground">
             <p>
               Shopify uses a straightforward pricing model with monthly subscription fees plus
               transaction and payment processing fees. Here&apos;s what you need to know:
             </p>
 
-            <div className="rounded-lg border p-4">
-              <h3 className="font-semibold text-foreground">Transaction Fee: 2.9%</h3>
-              <p className="mt-1 text-sm">
-                Charged on the total sale amount (item price + shipping). This fee varies by plan:
-                Basic Shopify (2.9%), Shopify (2.7%), Advanced (2.4%). Lower tiers have higher
-                fees.
-              </p>
+            <div className="rounded-xl border bg-card/50 backdrop-blur-sm p-4 transition-all hover:shadow-md hover:border-green-500/30">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center">
+                  <span className="text-green-600 dark:text-green-400 font-bold">%</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">Transaction Fee: 2.9%</h3>
+                  <p className="text-sm">
+                    Charged on the total sale amount (item price + shipping). This fee varies by plan:
+                    Basic Shopify (2.9%), Shopify (2.7%), Advanced (2.4%). Lower tiers have higher
+                    fees.
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div className="rounded-lg border p-4">
-              <h3 className="font-semibold text-foreground">Payment Processing: 2.9%</h3>
-              <p className="mt-1 text-sm">
-                Shopify Payments processing fee. Like the transaction fee, this percentage applies
-                to the total sale including shipping. Advanced plans get lower rates (2.4%).
-              </p>
+            <div className="rounded-xl border bg-card/50 backdrop-blur-sm p-4 transition-all hover:shadow-md hover:border-green-500/30">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center">
+                  <span className="text-green-600 dark:text-green-400 font-bold">£</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">Payment Processing: 2.9%</h3>
+                  <p className="text-sm">
+                    Shopify Payments processing fee. Like the transaction fee, this percentage applies
+                    to the total sale including shipping. Advanced plans get lower rates (2.4%).
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div className="rounded-lg border p-4">
-              <h3 className="font-semibold text-foreground">Monthly Subscription</h3>
-              <p className="mt-1 text-sm">
-                Basic Shopify starts at £25/month, Shopify at £65/month, and Advanced at £399/month.
-                Higher tiers offer lower transaction fees and additional features.
-              </p>
-            </div>
-
-            <div className="mt-6 rounded-lg bg-blue-50 p-4 dark:bg-blue-950">
-              <h3 className="font-semibold text-foreground">
-                Why Shopify Fees Are Lower Than Other Platforms
-              </h3>
-              <p className="mt-2 text-sm">
-                At around 5.8% total fees, Shopify is significantly cheaper than Etsy (10.5%) or
-                Amazon (15%). However, you need to factor in the monthly subscription cost. For
-                high-volume sellers, Shopify is usually more cost-effective.
-              </p>
+            <div className="rounded-xl border bg-card/50 backdrop-blur-sm p-4 transition-all hover:shadow-md hover:border-green-500/30">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center">
+                  <span className="text-green-600 dark:text-green-400 font-bold">+</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">Monthly Subscription</h3>
+                  <p className="text-sm">
+                    Basic Shopify starts at £25/month, Shopify at £65/month, and Advanced at £399/month.
+                    Higher tiers offer lower transaction fees and additional features.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -176,9 +207,9 @@ export default function ShopifyProfitCalculatorPage() {
         {/* FAQ Section */}
         <div className="mx-auto mt-16 max-w-3xl">
           <h2 className="text-2xl font-bold md:text-3xl">Frequently Asked Questions</h2>
-          <div className="mt-6 space-y-6">
+          <div className="mt-6 space-y-4">
             {faqStructuredData.mainEntity.map((faq, index) => (
-              <div key={index} className="rounded-lg border p-4">
+              <div key={index} className="rounded-xl border bg-card/50 backdrop-blur-sm p-4 transition-all hover:shadow-md">
                 <h3 className="font-semibold">{faq.name}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">
                   {faq.acceptedAnswer.text}
@@ -197,33 +228,37 @@ export default function ShopifyProfitCalculatorPage() {
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <a
               href="/calculators/etsy-fee-calculator"
-              className="rounded-lg border p-4 hover:border-primary hover:bg-muted/50"
+              className="group relative overflow-hidden rounded-xl border bg-card/50 backdrop-blur-sm p-4 transition-all hover:-translate-y-1 hover:shadow-lg"
             >
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 to-amber-500" />
               <span className="font-semibold">Etsy Fee Calculator</span>
               <span className="mt-1 block text-sm text-muted-foreground">
-                Calculate Etsy fees &amp; profit
+                Calculate Etsy fees and profit
               </span>
             </a>
             <a
               href="/calculators/ebay-fee-calculator"
-              className="rounded-lg border p-4 hover:border-primary hover:bg-muted/50"
+              className="group relative overflow-hidden rounded-xl border bg-card/50 backdrop-blur-sm p-4 transition-all hover:-translate-y-1 hover:shadow-lg"
             >
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500" />
               <span className="font-semibold">eBay Fee Calculator</span>
-              <span className="mt-1 block text-sm text-muted-foreground">Coming soon</span>
+              <span className="mt-1 block text-sm text-muted-foreground">Calculate eBay fees and profit</span>
             </a>
             <a
               href="/calculators/amazon-fba-calculator"
-              className="rounded-lg border p-4 hover:border-primary hover:bg-muted/50"
+              className="group relative overflow-hidden rounded-xl border bg-card/50 backdrop-blur-sm p-4 transition-all hover:-translate-y-1 hover:shadow-lg"
             >
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-orange-500" />
               <span className="font-semibold">Amazon FBA Calculator</span>
-              <span className="mt-1 block text-sm text-muted-foreground">Coming soon</span>
+              <span className="mt-1 block text-sm text-muted-foreground">Calculate Amazon fees and profit</span>
             </a>
             <a
               href="/calculators/tiktok-shop-calculator"
-              className="rounded-lg border p-4 hover:border-primary hover:bg-muted/50"
+              className="group relative overflow-hidden rounded-xl border bg-card/50 backdrop-blur-sm p-4 transition-all hover:-translate-y-1 hover:shadow-lg"
             >
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-pink-500 to-red-500" />
               <span className="font-semibold">TikTok Shop Calculator</span>
-              <span className="mt-1 block text-sm text-muted-foreground">Coming soon</span>
+              <span className="mt-1 block text-sm text-muted-foreground">Calculate TikTok Shop fees and profit</span>
             </a>
           </div>
         </div>

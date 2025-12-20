@@ -31,7 +31,10 @@ export interface Material {
   userId: string;
   name: string;
   unit: string; // 'sheet', 'ml', 'g', 'piece', etc.
-  costPerUnit: number; // in minor units
+  costPerUnit: number; // in minor units (from preferred supplier or manual)
+  // NEW: Array of supplier links (many-to-many)
+  supplierLinks: MaterialSupplierLink[];
+  // DEPRECATED: Keep for migration, will be removed
   supplier?: string;
   supplierSku?: string;
   category?: string;
@@ -48,17 +51,130 @@ export interface CostHistoryEntry {
   date: Date;
 }
 
-// Suppliers (Dropship mode)
+// ============================================
+// Suppliers (Unified - for materials AND products)
+// ============================================
+
+// Supplier type discriminator
+export type SupplierType = 'materials' | 'products' | 'both';
+
+// Platform for product suppliers (dropship/POD/resale)
+export type SupplierPlatform =
+  | 'aliexpress'
+  | 'alibaba'
+  | 'cjdropshipping'
+  | 'printful'
+  | 'printify'
+  | 'gooten'
+  | 'wholesale'
+  | 'local'
+  | 'other';
+
+// Contact information shared across all suppliers
+export interface SupplierContact {
+  email?: string;
+  phone?: string;
+  contactName?: string;
+}
+
+// Materials supplier additional fields
+export interface MaterialsSupplierFields {
+  accountNumber?: string;
+  customerReference?: string;
+  minimumOrderValue?: number; // in minor units
+  leadTimeDays?: number;
+  freeShippingThreshold?: number; // in minor units
+}
+
+// Product supplier additional fields (dropship/POD/resale)
+export interface ProductSupplierFields {
+  platform: SupplierPlatform;
+  shipsFrom?: string; // e.g., "China", "USA", "UK"
+  shippingTimeDaysMin?: number;
+  shippingTimeDaysMax?: number;
+  processingTimeDays?: number;
+  handlesReturns?: boolean;
+  isPrintOnDemand?: boolean;
+}
+
+// Unified Supplier interface
 export interface Supplier {
   id: string;
   userId: string;
   name: string;
-  platform: 'aliexpress' | 'alibaba' | 'cjdropshipping' | 'printful' | 'other';
+  supplierType: SupplierType;
   currency: Currency;
   website?: string;
   notes?: string;
+  contact?: SupplierContact;
+  // Conditional fields based on supplierType
+  materialsFields?: MaterialsSupplierFields;
+  productsFields?: ProductSupplierFields;
+  isFavourite: boolean;
+  usageCount: number;
   createdAt: Date;
   updatedAt: Date;
+}
+
+// Type guards for supplier type checking
+export function isMaterialsSupplier(supplier: Supplier): boolean {
+  return supplier.supplierType === 'materials' || supplier.supplierType === 'both';
+}
+
+export function isProductsSupplier(supplier: Supplier): boolean {
+  return supplier.supplierType === 'products' || supplier.supplierType === 'both';
+}
+
+// ============================================
+// Material-Supplier Links (Many-to-Many)
+// ============================================
+
+// Quality rating for supplier-material relationship
+export type QualityRating = 1 | 2 | 3 | 4 | 5;
+
+// Stock availability status
+export type StockStatus =
+  | 'in_stock'
+  | 'low_stock'
+  | 'out_of_stock'
+  | 'discontinued'
+  | 'unknown';
+
+// The link between a Material and a Supplier
+export interface MaterialSupplierLink {
+  id: string;
+  supplierId: string;
+  supplierName: string; // Denormalized for display
+  costPerUnit: number; // in minor units
+  currency: Currency;
+  sku?: string;
+  productUrl?: string;
+  qualityRating?: QualityRating;
+  stockStatus: StockStatus;
+  lastCheckedDate?: Date;
+  minimumOrderQuantity?: number;
+  packSize?: number;
+  isPreferred: boolean;
+  costHistory: CostHistoryEntry[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Helper to get the preferred supplier link
+export function getPreferredSupplierLink(
+  supplierLinks: MaterialSupplierLink[]
+): MaterialSupplierLink | undefined {
+  return supplierLinks.find((link) => link.isPreferred);
+}
+
+// Helper to get the lowest cost supplier link
+export function getLowestCostSupplierLink(
+  supplierLinks: MaterialSupplierLink[]
+): MaterialSupplierLink | undefined {
+  if (supplierLinks.length === 0) return undefined;
+  return supplierLinks.reduce((lowest, link) =>
+    link.costPerUnit < lowest.costPerUnit ? link : lowest
+  );
 }
 
 // Products
