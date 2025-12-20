@@ -228,3 +228,52 @@ export interface Subscription {
   status: 'active' | 'canceled' | 'past_due' | 'trialing';
   currentPeriodEnd?: Date;
 }
+
+// Payment Methods
+export type PaymentMethod = 'platform_included' | 'paypal' | 'stripe' | 'square' | 'manual';
+
+// Overhead/Fixed Costs
+export interface OverheadItem {
+  id: string;
+  name: string;
+  amount: number;  // Monthly cost in minor units
+  category?: 'rent' | 'utilities' | 'software' | 'insurance' | 'marketing' | 'other';
+}
+
+// Discount Analysis
+export interface DiscountAnalysisResult {
+  discountPercent: number;
+  discountedPrice: number;
+  originalPrice: number;
+  discount: number;
+  fees: number;
+  profit: number;
+  margin: number;
+  isProfitable: boolean;
+}
+
+// Batch Pricing
+export interface BatchTier {
+  quantity: number;
+  unitCost: number;
+  profitPerUnit: number;
+  totalProfit: number;
+  margin: number;
+}
+
+// Scenario Analysis
+export interface ScenarioConfig {
+  name: string;
+  materialCostChange: number;    // percentage change, e.g., 10 for +10%
+  labourCostChange: number;
+  shippingCostChange: number;
+  salePriceChange: number;
+}
+
+export interface ScenarioResult {
+  scenario: ScenarioConfig;
+  profit: number;
+  margin: number;
+  profitChange: number;     // vs base case
+  marginChange: number;
+}

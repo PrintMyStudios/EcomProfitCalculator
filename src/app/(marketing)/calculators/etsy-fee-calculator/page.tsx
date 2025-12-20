@@ -180,7 +180,9 @@ export default function EtsyFeeCalculatorPage() {
               className="rounded-lg border p-4 hover:border-primary hover:bg-muted/50"
             >
               <span className="font-semibold">eBay Fee Calculator</span>
-              <span className="mt-1 block text-sm text-muted-foreground">Coming soon</span>
+              <span className="mt-1 block text-sm text-muted-foreground">
+                Calculate eBay fees and profit
+              </span>
             </a>
             <a
               href="/calculators/amazon-fba-calculator"

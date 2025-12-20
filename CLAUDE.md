@@ -45,14 +45,26 @@ src/
 │       └── settings/
 ├── components/
 │   ├── ui/                   # shadcn/ui primitives
-│   ├── calculator/           # Shared calculator components
+│   ├── calculator/           # Calculator components:
+│   │   ├── discount-analysis-table.tsx
+│   │   ├── payment-method-selector.tsx
+│   │   ├── batch-pricing-table.tsx
+│   │   ├── scenario-sliders.tsx
+│   │   ├── circular-gauge.tsx
+│   │   └── icons.tsx
 │   ├── marketing/            # Landing page components
 │   └── app/                  # Main app components
 ├── lib/
 │   ├── firebase/             # Firebase config, auth helpers, firestore
 │   ├── stripe/               # Stripe config, checkout, webhooks
-│   ├── calculations/         # Pure calculation functions
-│   ├── constants/            # Platform fees, VAT rates, currencies
+│   ├── calculations/         # Pure calculation functions:
+│   │   ├── fees.ts           # Platform fee calculations
+│   │   ├── rounding.ts       # Price rounding utilities
+│   │   ├── discount-analysis.ts  # Discount profit analysis
+│   │   ├── batch-pricing.ts  # Quantity pricing
+│   │   ├── scenarios.ts      # What-if analysis
+│   │   └── overhead.ts       # Fixed cost allocation
+│   ├── constants/            # Platform fees, VAT rates, currencies, payment methods
 │   └── utils.ts              # Helper functions
 ├── stores/                   # Zustand stores (client-side state)
 ├── types/                    # TypeScript type definitions
@@ -128,6 +140,33 @@ margin = (profit / receiptsExVAT) × 100
 ```
 profit = price + sellerShipping - productCost - platformFees
 margin = (profit / price) × 100
+```
+
+**Discount Analysis:**
+```
+For each discount % (10, 15, 20, 25, 30, 40, 50):
+  discountedPrice = salePrice × (1 - discount%)
+  fees = platformFees(discountedPrice)
+  profit = discountedPrice - productCost - fees
+  isProfitable = profit > 0
+
+breakEvenDiscount = binary search for max discount where profit > 0
+```
+
+**Payment Processing Fees:**
+```
+PayPal: 3.6% + £0.30 per transaction
+Stripe: 2.9% + £0.30 per transaction
+Square: 2.7% + £0.20 per transaction
+Platform Included: £0 (Etsy, eBay, Shopify, TikTok include payment processing)
+```
+
+**Batch Pricing:**
+```
+For each quantity (1, 5, 10, 25, 50, 100):
+  unitCost = baseUnitCost + (fixedCosts / quantity)
+  totalProfit = profitPerUnit × quantity
+  margin = profitPerUnit / salePrice × 100
 ```
 
 ## Platform Fee Defaults
@@ -213,124 +252,68 @@ Free calculator landing pages at `/calculators/[platform]-fee-calculator`:
 
 ## Claude Code Agents
 
-Use these prompts to run parallel agents for faster development.
+Agents are launched via the Task tool. These prompts serve as reference templates.
 
-### How Agents Work
-- Agents run **independently** in separate contexts
-- They **don't communicate** with each other directly
-- The **main Claude instance coordinates** results
-- Run them in **parallel** when tasks don't depend on each other
-- Each agent sees the full CLAUDE.md for context
+### Completed Agents (M0-M3.5)
+- [x] SEO Landing Pages (Etsy, eBay, Amazon, Shopify, TikTok)
+- [x] Homepage with features, pricing, FAQ
+- [x] Auth System (login, signup, forgot-password)
+- [x] Onboarding Wizard (5 steps, multi-select seller types)
+- [x] App Shell & Navigation (sidebar, mobile menu, user dropdown)
+- [x] Dashboard with quick actions
+- [x] Core Calculator (product cost, fees, profit, margin)
+- [x] Calculator Pro Features:
+  - [x] Payment Processing (PayPal, Stripe, Square)
+  - [x] Discount Analysis (10-50% off profit table)
+  - [x] Batch/Quantity Pricing (1-100 units)
+  - [x] Scenario What-If Analysis (sliders + presets)
+  - [x] Premium UI (glassmorphism, gradients, animated gauge)
 
-### Agent Prompts (copy these to run)
+### M4 Agents (Current)
 
-**Agent 1: SEO Landing Page**
+**Agent: Materials Library**
 ```
-Build the Etsy fee calculator SEO landing page at /calculators/etsy-fee-calculator.
-
-Requirements from CLAUDE.md:
-- SSG page with SEO meta tags and Open Graph
-- Structured data (FAQ schema) for rich snippets
-- Embedded calculator component (no auth required)
-- Inputs: product cost, sale price, shipping
-- Calculate Etsy fees: 6.5% + 4% + £0.20 + £0.15
-- Show: fees breakdown, profit, margin
-- CTA: "Save & compare → Sign up free"
-- Mobile responsive, dark mode support
-- Use shadcn/ui components
-
-Read CLAUDE.md for full context. Use existing /lib/calculations and /lib/constants.
-```
-
-**Agent 2: Auth System**
-```
-Build the authentication system with Firebase.
+Build materials management at /app/materials (for handmade sellers).
 
 Requirements:
-- /login page with email + Google sign-in
-- /signup page with email + Google
-- /forgot-password page
-- useAuth hook (already scaffolded in /hooks/use-auth.ts)
-- Protected route wrapper component
-- Redirect unauthenticated users to /login
-- After login, redirect to /app/dashboard
+- Materials CRUD (create, read, update, delete)
+- Fields: name, unit, cost per unit, supplier, category, notes
+- Cost history tracking
+- Favourite and usage count
+- Save to Firestore under users/{userId}/materials
+- Search and filter
+- Empty state guiding workflow
 
-Use Firebase Auth from /lib/firebase. Use shadcn/ui for forms.
-Read CLAUDE.md for full context.
+Use shadcn/ui data table, forms, dialogs.
 ```
 
-**Agent 3: Onboarding Wizard**
+**Agent: Suppliers Management**
 ```
-Build the onboarding wizard shown after first signup.
-
-Steps:
-1. "What do you sell?" - Multi-select: Handmade, Dropship, Print-on-Demand, Resale
-2. Country selection (dropdown)
-3. "Are you VAT registered?" - Yes / No / Not sure
-4. Primary marketplace - Etsy, eBay, Amazon, Shopify, TikTok
-5. Currency (auto-suggested from country)
-
-Save to Firestore under users/{userId}/profile.
-Update Zustand store (src/stores/settings.ts).
-Use shadcn/ui components, add step indicator.
-Read CLAUDE.md for full context.
-```
-
-**Agent 4: App Shell & Navigation**
-```
-Build the main app shell layout for /app/* routes.
+Build suppliers management at /app/suppliers (for sourced product sellers).
 
 Requirements:
-- Sidebar navigation (collapsible on mobile)
-- Nav items: Dashboard, Calculator, Products, Materials*, Suppliers*, Shipping, Platforms, History, Settings
-- Items marked * should show/hide based on user's sellerTypes (from settings store)
-- Dark mode toggle in header
-- User avatar/menu with logout
-- Breadcrumb support
-- Mobile-friendly hamburger menu
+- Suppliers CRUD
+- Fields: name, platform (AliExpress, Printful, etc.), currency, website, notes
+- Save to Firestore under users/{userId}/suppliers
 
-Use shadcn/ui sidebar component. Read settings from Zustand store.
-Read CLAUDE.md for full context.
+Use shadcn/ui data table, forms, dialogs.
 ```
 
-**Agent 5: Calculator Core**
-```
-Build the main calculator page at /app/calculator.
-
-Requirements:
-- Product selector (or manual cost entry)
-- Sale price input with currency formatting
-- Shipping cost input (toggle: seller pays / buyer pays)
-- Platform selector (Etsy, eBay, etc.)
-- Quantity input
-- Results panel showing:
-  - Fees breakdown (itemized)
-  - Profit (in currency)
-  - Margin (percentage)
-  - Break-even price
-  - Target price (for X% margin)
-- Rounding options (.99, .50, .00)
-- "Save calculation" button
-
-Use /lib/calculations for all math. Use shadcn/ui.
-Read CLAUDE.md for full context.
-```
-
-**Agent 6: Product Management**
+**Agent: Product Management**
 ```
 Build product management at /app/products.
 
 Requirements:
-- List view with search/filter
+- List view with search/filter by type
 - Two product types (see types/index.ts):
-  - HandmadeProduct: materials + labour + packaging
-  - SourcedProduct: supplier cost + shipping
+  - HandmadeProduct: materials + quantities, labour, packaging
+  - SourcedProduct: supplier, cost, shipping, source type
 - Create/Edit forms for each type
 - Product cost auto-calculates
 - Save to Firestore under users/{userId}/products
 - Delete with confirmation
-- Favourite toggle
+- Tags and favourites
+- Select saved product in calculator
 
 Use shadcn/ui data table, forms, dialogs.
-Read CLAUDE.md for full context.
 ```

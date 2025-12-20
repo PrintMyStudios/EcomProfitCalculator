@@ -80,8 +80,8 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
   const { showMaterialsLibrary, showSuppliers, showTimeTracking } = useSettingsStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Skip protected route wrapper for onboarding page
-  const isOnboarding = pathname === '/onboarding';
+  // Skip protected route wrapper for these pages
+  const isPublicRoute = pathname === '/onboarding' || pathname === '/calculator';
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: HomeIcon, show: true },
@@ -198,7 +198,7 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
     </div>
   );
 
-  if (isOnboarding) {
+  if (isPublicRoute) {
     return content;
   }
 
