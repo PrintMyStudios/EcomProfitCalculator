@@ -71,6 +71,22 @@ const faqStructuredData = {
         text: 'To calculate your Etsy profit margin: Profit = Sale Price - Product Cost - Etsy Fees - Shipping Cost (if you pay it). Margin = (Profit ÷ Sale Price) × 100. Use our free calculator above to see your exact profit and margin instantly.',
       },
     },
+    {
+      '@type': 'Question',
+      name: 'What are Etsy Offsite Ads and how much do they cost?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Etsy Offsite Ads promote your listings on Google, Facebook, Instagram, and Pinterest. You only pay when a customer clicks an ad and makes a purchase within 30 days. Shops earning under $10,000/year pay 15% of the sale, while shops earning $10,000+ pay 12%. The fee is capped at $100 per order.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Can I opt out of Etsy Offsite Ads?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'It depends on your sales volume. Shops earning less than $10,000 USD per year can opt out of Offsite Ads. However, shops that have earned $10,000 or more in the last 365 days are automatically enrolled and cannot opt out - this is mandatory for the lifetime of your shop once you reach this threshold.',
+      },
+    },
   ],
 };
 
@@ -189,6 +205,64 @@ export default function EtsyFeeCalculatorPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Offsite Ads Section */}
+        <div className="mx-auto mt-16 max-w-3xl">
+          <h2 className="text-2xl font-bold md:text-3xl">
+            <span className="bg-gradient-to-r from-orange-500 to-amber-500 bg-clip-text text-transparent">Etsy Offsite Ads</span> Explained
+          </h2>
+          <div className="mt-6 space-y-4 text-muted-foreground">
+            <p>
+              Etsy Offsite Ads promote your listings on Google, Facebook, Instagram, and Pinterest.
+              You only pay when a customer clicks an ad and makes a purchase within 30 days.
+            </p>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-xl border bg-card/50 backdrop-blur-sm p-4 transition-all hover:shadow-md hover:border-orange-500/30">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-orange-500/20 to-amber-500/20 flex items-center justify-center">
+                    <span className="text-orange-600 dark:text-orange-400 font-bold text-lg">15%</span>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground">Under $10k/year</h3>
+                    <p className="text-sm">
+                      Optional - you can opt out
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-xl border bg-card/50 backdrop-blur-sm p-4 transition-all hover:shadow-md hover:border-orange-500/30">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-orange-500/20 to-amber-500/20 flex items-center justify-center">
+                    <span className="text-orange-600 dark:text-orange-400 font-bold text-lg">12%</span>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground">$10k+/year</h3>
+                    <p className="text-sm">
+                      <strong>Mandatory</strong> - cannot opt out
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/50">
+              <h3 className="font-semibold text-amber-900 dark:text-amber-100">Important to Know</h3>
+              <ul className="mt-2 space-y-1 text-sm text-amber-800 dark:text-amber-200">
+                <li>• Fee is capped at $100 USD per order</li>
+                <li>• Only charged when a sale is attributed to an ad click (typically 10-15% of sales)</li>
+                <li>• Once you hit $10k, you&apos;re locked in for life (even if sales drop later)</li>
+                <li>• The 30-day attribution window means you pay even for delayed purchases</li>
+              </ul>
+            </div>
+
+            <p className="text-sm">
+              Our calculator above shows your profit both with and without Offsite Ads fees,
+              so you can see exactly how it affects your margins.
+            </p>
           </div>
         </div>
 

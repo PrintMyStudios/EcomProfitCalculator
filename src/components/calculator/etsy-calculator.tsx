@@ -22,6 +22,11 @@ export function EtsyCalculator() {
   // Get Etsy fees from constants
   const etsyTemplate = DEFAULT_PLATFORM_TEMPLATES.etsy;
 
+  // Etsy Offsite Ads fee rates
+  // 15% for shops under $10,000/year, 12% for shops over $10,000/year
+  const OFFSITE_ADS_RATE_STANDARD = 15; // Under $10k
+  const OFFSITE_ADS_RATE_DISCOUNTED = 12; // Over $10k (mandatory)
+
   // Calculate results
   const results = useMemo(() => {
     const productCostMinor = toMinorUnits(parseFloat(productCost) || 0, 'GBP');
@@ -55,6 +60,30 @@ export function EtsyCalculator() {
       isVatRegistered,
     });
 
+    // Calculate Offsite Ads fees (charged on item price only, not shipping)
+    // Standard rate (15%) for shops under $10k/year
+    const offsiteAdsFeeSstandard = Math.round(salePriceMinor * (OFFSITE_ADS_RATE_STANDARD / 100));
+    // Discounted rate (12%) for shops over $10k/year (mandatory)
+    const offsiteAdsFeeDiscounted = Math.round(salePriceMinor * (OFFSITE_ADS_RATE_DISCOUNTED / 100));
+
+    // Profit with Offsite Ads (standard 15%)
+    const { profit: profitWithOffsiteAdsStandard, margin: marginWithOffsiteAdsStandard } = calculateProfit({
+      revenue,
+      productCost: totalProductCost,
+      platformFees: totalFees + offsiteAdsFeeSstandard,
+      vatRate,
+      isVatRegistered,
+    });
+
+    // Profit with Offsite Ads (discounted 12%)
+    const { profit: profitWithOffsiteAdsDiscounted, margin: marginWithOffsiteAdsDiscounted } = calculateProfit({
+      revenue,
+      productCost: totalProductCost,
+      platformFees: totalFees + offsiteAdsFeeDiscounted,
+      vatRate,
+      isVatRegistered,
+    });
+
     // Break-even price (simplified - where profit = 0)
     // profit = revenue - cost - fees
     // For break-even: revenue = cost + fees
@@ -81,6 +110,17 @@ export function EtsyCalculator() {
       breakEvenPrice,
       receiptsExVat,
       isProfit: profit > 0,
+      // Offsite Ads data
+      offsiteAds: {
+        feeStandard: offsiteAdsFeeSstandard,
+        feeDiscounted: offsiteAdsFeeDiscounted,
+        profitWithStandard: profitWithOffsiteAdsStandard,
+        marginWithStandard: marginWithOffsiteAdsStandard,
+        profitWithDiscounted: profitWithOffsiteAdsDiscounted,
+        marginWithDiscounted: marginWithOffsiteAdsDiscounted,
+        isProfitableWithStandard: profitWithOffsiteAdsStandard > 0,
+        isProfitableWithDiscounted: profitWithOffsiteAdsDiscounted > 0,
+      },
     };
   }, [productCost, salePrice, shippingCost, sellerPaysShipping, isVatRegistered, etsyTemplate.fees]);
 
@@ -285,6 +325,72 @@ export function EtsyCalculator() {
               </p>
             </div>
           )}
+
+          <Separator />
+
+          {/* Offsite Ads Impact Section */}
+          <div>
+            <h4 className="mb-3 flex items-center gap-2 text-sm font-medium">
+              <svg className="h-4 w-4 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+              </svg>
+              If Sold via Offsite Ads
+            </h4>
+            <p className="mb-3 text-xs text-muted-foreground">
+              Etsy promotes your listings on Google, Facebook, etc. You only pay if it results in a sale.
+            </p>
+
+            <div className="space-y-3 rounded-lg bg-muted/50 p-3">
+              {/* 15% Rate (Under $10k) */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">
+                    15% fee <span className="text-xs">(shops under $10k/yr)</span>
+                  </span>
+                  <span className="font-medium text-orange-600 dark:text-orange-400">
+                    -{formatCurrency(results.offsiteAds.feeStandard, 'GBP')}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Profit with Offsite Ads</span>
+                  <span className={`text-sm font-semibold ${results.offsiteAds.isProfitableWithStandard ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                    {formatCurrency(results.offsiteAds.profitWithStandard, 'GBP')}
+                    <span className="ml-1 text-xs font-normal">({results.offsiteAds.marginWithStandard.toFixed(1)}%)</span>
+                  </span>
+                </div>
+              </div>
+
+              <Separator className="my-2" />
+
+              {/* 12% Rate (Over $10k - Mandatory) */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">
+                    12% fee <span className="text-xs">(shops over $10k/yr)</span>
+                  </span>
+                  <span className="font-medium text-orange-600 dark:text-orange-400">
+                    -{formatCurrency(results.offsiteAds.feeDiscounted, 'GBP')}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Profit with Offsite Ads</span>
+                  <span className={`text-sm font-semibold ${results.offsiteAds.isProfitableWithDiscounted ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                    {formatCurrency(results.offsiteAds.profitWithDiscounted, 'GBP')}
+                    <span className="ml-1 text-xs font-normal">({results.offsiteAds.marginWithDiscounted.toFixed(1)}%)</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Info box about mandatory participation */}
+            <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/50">
+              <p className="text-xs text-amber-800 dark:text-amber-200">
+                <strong>Note:</strong> Shops earning $10,000+ USD/year <strong>cannot opt out</strong> of Offsite Ads.
+                Smaller shops can opt out but pay 15% if they participate. Only ~10-15% of sales typically come through Offsite Ads.
+              </p>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

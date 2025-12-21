@@ -518,6 +518,50 @@ function CalculatorContent() {
     });
   }, [salePriceMinor, shippingCostMinor, freeShipping, productCost, totalFees, vatRate, vatRegistered]);
 
+  // Etsy Offsite Ads calculation (only for Etsy platform)
+  // 15% for shops under $10k/year, 12% for shops over $10k/year (mandatory)
+  const etsyOffsiteAds = useMemo(() => {
+    if (selectedPlatform !== 'etsy' || !salePriceMinor) return null;
+
+    const OFFSITE_ADS_RATE_STANDARD = 15; // Under $10k
+    const OFFSITE_ADS_RATE_DISCOUNTED = 12; // Over $10k (mandatory)
+
+    // Offsite Ads fee is charged on item price only
+    const feeStandard = Math.round(salePriceMinor * (OFFSITE_ADS_RATE_STANDARD / 100));
+    const feeDiscounted = Math.round(salePriceMinor * (OFFSITE_ADS_RATE_DISCOUNTED / 100));
+
+    const revenue = salePriceMinor + (freeShipping ? shippingCostMinor : 0);
+
+    // Profit with Offsite Ads (standard 15%)
+    const { profit: profitWithStandard, margin: marginWithStandard } = calculateProfit({
+      revenue,
+      productCost,
+      platformFees: totalFees + feeStandard,
+      vatRate,
+      isVatRegistered: vatRegistered,
+    });
+
+    // Profit with Offsite Ads (discounted 12%)
+    const { profit: profitWithDiscounted, margin: marginWithDiscounted } = calculateProfit({
+      revenue,
+      productCost,
+      platformFees: totalFees + feeDiscounted,
+      vatRate,
+      isVatRegistered: vatRegistered,
+    });
+
+    return {
+      feeStandard,
+      feeDiscounted,
+      profitWithStandard,
+      marginWithStandard,
+      profitWithDiscounted,
+      marginWithDiscounted,
+      isProfitableWithStandard: profitWithStandard > 0,
+      isProfitableWithDiscounted: profitWithDiscounted > 0,
+    };
+  }, [selectedPlatform, salePriceMinor, shippingCostMinor, freeShipping, productCost, totalFees, vatRate, vatRegistered]);
+
   // Calculate profit per hour (for handmade mode)
   const profitPerHour = useMemo(() => {
     if (costMode !== 'handmade' || !labourHours || parseFloat(labourHours) <= 0) return null;
@@ -1361,6 +1405,79 @@ function CalculatorContent() {
                   <span className="text-muted-foreground">Receipts (ex-VAT):</span>{' '}
                   <span className="font-semibold">{formatCurrency(receiptsExVat, currency)}</span>
                 </div>
+              )}
+
+              {/* Etsy Offsite Ads Section */}
+              {etsyOffsiteAds && (
+                <>
+                  <Separator />
+                  <div>
+                    <button
+                      onClick={() => {}}
+                      className="flex w-full items-center justify-between rounded-lg p-2 text-sm font-semibold"
+                    >
+                      <span className="flex items-center gap-2">
+                        <svg className="h-4 w-4 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                        </svg>
+                        If Sold via Offsite Ads
+                      </span>
+                    </button>
+                    <p className="px-2 mb-3 text-xs text-muted-foreground">
+                      Etsy promotes on Google, Facebook, etc. Only pay if it results in a sale.
+                    </p>
+
+                    <div className="space-y-3 rounded-lg bg-muted/50 p-3">
+                      {/* 15% Rate (Under $10k) */}
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">
+                            15% fee <span className="text-xs">(under $10k/yr)</span>
+                          </span>
+                          <span className="font-medium text-orange-600 dark:text-orange-400">
+                            -{formatCurrency(etsyOffsiteAds.feeStandard, currency)}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">Profit with Offsite Ads</span>
+                          <span className={`text-sm font-semibold ${etsyOffsiteAds.isProfitableWithStandard ? 'text-emerald-500' : 'text-red-500'}`}>
+                            {formatCurrency(etsyOffsiteAds.profitWithStandard, currency)}
+                            <span className="ml-1 text-xs font-normal">({etsyOffsiteAds.marginWithStandard.toFixed(1)}%)</span>
+                          </span>
+                        </div>
+                      </div>
+
+                      <Separator className="my-2" />
+
+                      {/* 12% Rate (Over $10k - Mandatory) */}
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">
+                            12% fee <span className="text-xs">(over $10k/yr)</span>
+                          </span>
+                          <span className="font-medium text-orange-600 dark:text-orange-400">
+                            -{formatCurrency(etsyOffsiteAds.feeDiscounted, currency)}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">Profit with Offsite Ads</span>
+                          <span className={`text-sm font-semibold ${etsyOffsiteAds.isProfitableWithDiscounted ? 'text-emerald-500' : 'text-red-500'}`}>
+                            {formatCurrency(etsyOffsiteAds.profitWithDiscounted, currency)}
+                            <span className="ml-1 text-xs font-normal">({etsyOffsiteAds.marginWithDiscounted.toFixed(1)}%)</span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Info box about mandatory participation */}
+                    <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-2 dark:border-amber-900 dark:bg-amber-950/50">
+                      <p className="text-xs text-amber-800 dark:text-amber-200">
+                        <strong>Note:</strong> Shops over $10k/yr <strong>cannot opt out</strong>. ~10-15% of sales come through Offsite Ads.
+                      </p>
+                    </div>
+                  </div>
+                </>
               )}
 
               <Separator />
