@@ -1,7 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { toast } from 'sonner';
 import { useAuth } from '@/components/auth/auth-provider';
+import { useProducts } from '@/hooks/use-products';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -359,8 +362,19 @@ function PlatformComparisonCard({
   );
 }
 
-export default function CalculatorPage() {
+function CalculatorContent() {
   const { userProfile } = useAuth();
+  const searchParams = useSearchParams();
+  const { products } = useProducts();
+
+  // Get product from URL params
+  const productIdParam = searchParams.get('productId');
+  const linkedProduct = productIdParam
+    ? products.find((p) => p.id === productIdParam)
+    : null;
+
+  // Track if we've loaded the product to avoid re-triggering
+  const [hasLoadedProduct, setHasLoadedProduct] = useState(false);
 
   // User settings with defaults
   const currency: Currency = userProfile?.currency || 'GBP';
@@ -410,6 +424,26 @@ export default function CalculatorPage() {
 
   // Fees panel collapsed
   const [feesExpanded, setFeesExpanded] = useState(false);
+
+  // Load product data when linked product is available
+  useEffect(() => {
+    if (linkedProduct && !hasLoadedProduct) {
+      const costInMajor = toMajorUnits(linkedProduct.calculatedCost, currency);
+      setManualCost(costInMajor.toFixed(2));
+      setCostMode('manual');
+      setHasLoadedProduct(true);
+      toast.success(`Loaded: ${linkedProduct.name}`, {
+        description: `Product cost: ${formatCurrency(linkedProduct.calculatedCost, currency)}`,
+      });
+    }
+  }, [linkedProduct, hasLoadedProduct, currency]);
+
+  // Clear linked product
+  const clearLinkedProduct = () => {
+    setHasLoadedProduct(false);
+    // Clear URL param by navigating without it
+    window.history.replaceState(null, '', '/calculator');
+  };
 
   // Calculate product cost based on mode
   const productCost = useMemo(() => {
@@ -771,6 +805,35 @@ export default function CalculatorPage() {
               <CardDescription>How much does it cost you to make or source this product?</CardDescription>
             </CardHeader>
             <CardContent>
+              {/* Linked Product Badge */}
+              {linkedProduct && hasLoadedProduct && (
+                <div className="mb-4 flex items-center justify-between rounded-lg border border-primary/30 bg-primary/5 p-3">
+                  <div className="flex items-center gap-2">
+                    <div className="rounded-md bg-primary/10 p-1.5">
+                      <svg className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{linkedProduct.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Cost: {formatCurrency(linkedProduct.calculatedCost, currency)} (from product)
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearLinkedProduct}
+                    className="h-8 w-8 p-0"
+                  >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </Button>
+                </div>
+              )}
+
               <Tabs value={costMode} onValueChange={(v) => setCostMode(v as typeof costMode)}>
                 <TabsList className="grid w-full grid-cols-3 bg-muted/50">
                   <TabsTrigger value="manual" className="data-[state=active]:bg-white data-[state=active]:shadow-sm dark:data-[state=active]:bg-slate-800">
@@ -1449,5 +1512,30 @@ export default function CalculatorPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Loading fallback for Suspense
+function CalculatorLoading() {
+  return (
+    <div className="space-y-6 animate-pulse">
+      <div className="h-8 w-48 bg-muted rounded" />
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2 space-y-6">
+          <div className="h-64 bg-muted rounded-lg" />
+          <div className="h-48 bg-muted rounded-lg" />
+        </div>
+        <div className="h-96 bg-muted rounded-lg" />
+      </div>
+    </div>
+  );
+}
+
+// Export with Suspense wrapper for useSearchParams
+export default function CalculatorPage() {
+  return (
+    <Suspense fallback={<CalculatorLoading />}>
+      <CalculatorContent />
+    </Suspense>
   );
 }

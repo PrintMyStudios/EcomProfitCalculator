@@ -1,7 +1,7 @@
 # PLAN.md - EcomProfitCalculator
 
 ## Current Focus
-M4 - Product Management
+M5 - Platform & Shipping Templates
 
 ## Milestones
 - [x] M0 - Project setup ✅
@@ -9,7 +9,7 @@ M4 - Product Management
 - [x] M2 - Auth + onboarding wizard ✅
 - [x] M3 - Core calculator (both product types) ✅
 - [x] M3.5 - Calculator Pro Features ✅
-- [ ] M4 - Product management (+ variants)
+- [x] M4 - Product management ✅
 - [ ] M5 - Platform & shipping templates (+ weight-based shipping)
 - [ ] M6 - Comparison, history, dashboard
 - [ ] M7 - Stripe subscriptions
@@ -156,7 +156,7 @@ M4 - Product Management
 
 ---
 
-## M4 - Product Management (+ Variants)
+## M4 - Product Management ✅ COMPLETE
 **Goal:** Users can save products/materials/suppliers and reuse them in calculations.
 
 **Done when:**
@@ -169,6 +169,8 @@ M4 - Product Management
   - [x] Quick-add supplier from material card (hover action)
   - [x] Stock status badges and warnings on cards
   - [x] Search, filter by category, sort by name/cost/recent
+  - [x] Invoice/Bulk purchase splitting (calculate per-unit cost from total)
+  - [x] VAT warning for cost inputs (VAT-registered users)
 - [x] **Suppliers** (unified for ALL seller types):
   - [x] Suppliers CRUD with real-time Firebase sync
   - [x] Unified Supplier entity with type: materials / products / both
@@ -177,27 +179,49 @@ M4 - Product Management
   - [x] Products supplier fields: platform, ships from, shipping/processing time, returns handling
   - [x] Type filter, platform filter, favourites, search
   - [x] Suppliers visible for ALL seller types (not just dropshippers)
-- [ ] **Products** (unified, two types):
-  - [ ] Products list with type filter (Handmade / Sourced)
-  - [ ] HandmadeProduct: name, materials + quantities, labour, packaging
-  - [ ] SourcedProduct: name, supplier, cost, shipping, source type (dropship/POD/resale/wholesale)
-  - [ ] Auto-calculate product cost
-  - [ ] Tags and favourites
-- [ ] **Product Variants**:
+- [x] **Products** (unified, two types):
+  - [x] Products list with type filter (Handmade / Sourced)
+  - [x] HandmadeProduct: name, materials + quantities, labour tasks, packaging
+  - [x] SourcedProduct: name, supplier, cost, shipping, source type (dropship/POD/resale/wholesale)
+  - [x] Auto-calculate product cost
+  - [x] Tags and favourites
+  - [x] Materials selector with search and favourites filter
+  - [x] Labour tasks editor with timer integration
+  - [x] VAT warning for cost inputs
+  - [x] "Use in Calculator" action
+- [x] **Bundles** (multiple products sold together):
+  - [x] Bundles page at `/bundles`
+  - [x] Create bundle from 2+ products
+  - [x] Auto-calculated combined cost
+  - [x] Optional suggested price with discount percentage
+  - [x] "Use in Calculator" action
+  - [x] Gate: requires 2+ products to create bundle
+- [x] **Calculator ← Product Integration**:
+  - [x] Calculator reads `productId` from URL params
+  - [x] Loads product and pre-fills cost
+  - [x] Shows linked product badge with clear button
+  - [x] Toast notification on product load
+- [x] **Saved Calculations (History)**:
+  - [x] Save calculations to Firestore
+  - [x] History page (renamed to "Calculations")
+  - [x] Re-calculate action with product linking
+  - [x] Delete individual or clear all
+  - [x] Summary stats (total, profitable, avg margin)
+- [x] All data persisted to Firestore
+- [x] Empty states guide user through workflow
+- [x] Skeleton loading components for all pages
+- [x] CSS animations with reduced-motion support
+- [x] Onboarding wizard with confetti celebration
+- [ ] **Product Variants** (deferred to future):
   - [ ] Variant dimensions: size, colour, material, style
-  - [ ] Variant-specific costs (different sizes = different material costs)
-  - [ ] Variant-specific weights (for shipping calculations)
-  - [ ] Variant pricing matrix (base + modifiers)
-  - [ ] Bulk variant creation (e.g., "S, M, L, XL" auto-generates 4 variants)
-  - [ ] Copy pricing across variants with adjustments
-- [ ] All data persisted to Firestore
-- [ ] Select saved product in calculator
-- [ ] Material cost changes propagate to handmade products
-- [ ] Empty states guide user through workflow
+  - [ ] Variant-specific costs and weights
 
-**Files Created (Materials & Suppliers):**
+**Files Created:**
 - `src/app/(app)/materials/page.tsx`
 - `src/app/(app)/suppliers/page.tsx`
+- `src/app/(app)/products/page.tsx`
+- `src/app/(app)/bundles/page.tsx`
+- `src/app/(app)/history/page.tsx`
 - `src/components/materials/material-form.tsx`
 - `src/components/materials/material-card.tsx`
 - `src/components/materials/supplier-link-card.tsx`
@@ -205,18 +229,31 @@ M4 - Product Management
 - `src/components/materials/material-suppliers-section.tsx`
 - `src/components/suppliers/supplier-form.tsx`
 - `src/components/suppliers/supplier-card.tsx`
+- `src/components/products/product-form.tsx`
+- `src/components/products/materials-selector.tsx`
+- `src/components/products/labour-tasks-editor.tsx`
+- `src/components/skeletons/index.tsx`
+- `src/components/vat-warning.tsx`
+- `src/components/timer.tsx`
 - `src/lib/firebase/materials.ts`
 - `src/lib/firebase/suppliers.ts`
 - `src/lib/validations/material.ts`
 - `src/lib/validations/supplier.ts`
+- `src/lib/validations/product.ts`
+- `src/lib/validations/bundle.ts`
 - `src/lib/validations/material-supplier-link.ts`
 - `src/hooks/use-materials.ts`
 - `src/hooks/use-suppliers.ts`
+- `src/hooks/use-products.ts`
+- `src/hooks/use-bundles.ts`
+- `src/hooks/use-saved-calculations.ts`
+- `src/styles/animations.css`
 - `src/components/ui/dialog.tsx`
 - `src/components/ui/alert-dialog.tsx`
 - `src/components/ui/textarea.tsx`
 - `src/components/ui/sonner.tsx`
 - `src/components/ui/tooltip.tsx`
+- `src/components/ui/alert.tsx`
 
 ---
 

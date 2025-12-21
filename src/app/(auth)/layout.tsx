@@ -1,26 +1,17 @@
-'use client';
+import type { Metadata } from 'next';
+import { AuthLayoutContent } from '@/components/auth/auth-layout-content';
 
-import { AuthProvider } from '@/components/auth/auth-provider';
-import { Toaster } from '@/components/ui/sonner';
+export const metadata: Metadata = {
+  title: {
+    template: '%s | EcomProfitCalculator',
+    default: 'Account | EcomProfitCalculator',
+  },
+};
 
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <AuthProvider>
-      <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-12">
-        <div className="w-full max-w-md">
-          <div className="mb-8 text-center">
-            <a href="/" className="text-2xl font-bold">
-              EcomProfit<span className="text-primary">Calculator</span>
-            </a>
-          </div>
-          {children}
-        </div>
-      </div>
-      <Toaster position="top-right" richColors closeButton />
-    </AuthProvider>
-  );
+  return <AuthLayoutContent>{children}</AuthLayoutContent>;
 }

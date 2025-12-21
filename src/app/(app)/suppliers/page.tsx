@@ -5,12 +5,12 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from '@/components/ui/sheet';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import {
   Select,
   SelectContent,
@@ -29,6 +29,7 @@ import {
 } from '@/lib/validations/supplier';
 import type { Supplier, Currency, SupplierType } from '@/types';
 import { Plus, Search, Star, Package } from 'lucide-react';
+import { SuppliersPageSkeleton } from '@/components/skeletons';
 
 export default function SuppliersPage() {
   const {
@@ -43,7 +44,7 @@ export default function SuppliersPage() {
     platforms,
   } = useSuppliers();
 
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -126,13 +127,13 @@ export default function SuppliersPage() {
     });
   }, [suppliers, searchQuery, typeFilter, platformFilter, showFavouritesOnly, sortBy]);
 
-  const handleOpenSheet = (supplier?: Supplier) => {
+  const handleOpenDialog = (supplier?: Supplier) => {
     setEditingSupplier(supplier || null);
-    setSheetOpen(true);
+    setDialogOpen(true);
   };
 
-  const handleCloseSheet = () => {
-    setSheetOpen(false);
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
     setEditingSupplier(null);
   };
 
@@ -153,7 +154,7 @@ export default function SuppliersPage() {
         });
         toast.success('Supplier added');
       }
-      handleCloseSheet();
+      handleCloseDialog();
     } catch (err) {
       console.error('Failed to save supplier:', err);
       toast.error('Failed to save supplier', {
@@ -192,14 +193,7 @@ export default function SuppliersPage() {
   }, [platforms]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="flex flex-col items-center gap-2">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-sm text-muted-foreground">Loading suppliers...</p>
-        </div>
-      </div>
-    );
+    return <SuppliersPageSkeleton />;
   }
 
   if (error) {
@@ -223,7 +217,7 @@ export default function SuppliersPage() {
             Manage your materials and product suppliers
           </p>
         </div>
-        <Button onClick={() => handleOpenSheet()}>
+        <Button onClick={() => handleOpenDialog()}>
           <Plus className="w-4 h-4 mr-2" />
           Add Supplier
         </Button>
@@ -299,7 +293,7 @@ export default function SuppliersPage() {
 
       {/* Suppliers grid or empty state */}
       {suppliers.length === 0 ? (
-        <EmptyState onAddSupplier={() => handleOpenSheet()} />
+        <EmptyState onAddSupplier={() => handleOpenDialog()} />
       ) : filteredSuppliers.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-muted-foreground">No suppliers match your filters</p>
@@ -322,7 +316,7 @@ export default function SuppliersPage() {
             <SupplierCard
               key={supplier.id}
               supplier={supplier}
-              onEdit={handleOpenSheet}
+              onEdit={handleOpenDialog}
               onDelete={handleDelete}
               onToggleFavourite={handleToggleFavourite}
             />
@@ -330,41 +324,41 @@ export default function SuppliersPage() {
         </div>
       )}
 
-      {/* Add/Edit Sheet */}
-      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent className="sm:max-w-lg overflow-y-auto p-0">
+      {/* Add/Edit Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto p-0">
           {/* Header with gradient accent */}
           <div className="relative border-b bg-gradient-to-r from-emerald-500/5 to-green-500/5">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-green-600" />
-            <SheetHeader className="p-6 pb-4">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-green-600 rounded-t-lg" />
+            <DialogHeader className="p-6 pb-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500/20 to-green-500/20">
                   <Package className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <div>
-                  <SheetTitle className="text-lg">
+                  <DialogTitle className="text-lg">
                     {editingSupplier ? 'Edit Supplier' : 'Add Supplier'}
-                  </SheetTitle>
-                  <SheetDescription>
+                  </DialogTitle>
+                  <DialogDescription>
                     {editingSupplier
                       ? 'Update the details of this supplier'
                       : 'Add a new supplier for materials or products'}
-                  </SheetDescription>
+                  </DialogDescription>
                 </div>
               </div>
-            </SheetHeader>
+            </DialogHeader>
           </div>
           {/* Form content with proper padding */}
-          <div className="p-6">
+          <div className="p-6 pt-4">
             <SupplierForm
               supplier={editingSupplier || undefined}
               onSubmit={handleSubmit}
-              onCancel={handleCloseSheet}
+              onCancel={handleCloseDialog}
               isSubmitting={isSubmitting}
             />
           </div>
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

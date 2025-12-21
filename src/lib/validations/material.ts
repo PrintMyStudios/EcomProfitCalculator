@@ -41,8 +41,11 @@ export const MATERIAL_CATEGORIES = [
 
 export type MaterialCategory = typeof MATERIAL_CATEGORIES[number]['value'];
 
-// Validation schema for material form
-export const materialSchema = z.object({
+// Cost entry mode - per unit or bulk purchase
+export type CostEntryMode = 'per_unit' | 'bulk_purchase';
+
+// Base schema without refinement for type inference
+const baseMaterialSchema = z.object({
   name: z
     .string()
     .min(1, 'Material name is required')
@@ -50,9 +53,21 @@ export const materialSchema = z.object({
   unit: z
     .string()
     .min(1, 'Unit is required'),
+  // Cost entry mode - required field
+  costEntryMode: z.enum(['per_unit', 'bulk_purchase']),
+  // Per-unit cost (used when costEntryMode is 'per_unit' or calculated from bulk)
   costPerUnit: z
     .number({ message: 'Cost must be a number' })
     .min(0, 'Cost must be 0 or greater'),
+  // Bulk purchase fields (only used when costEntryMode is 'bulk_purchase')
+  bulkQuantity: z
+    .number({ message: 'Quantity must be a number' })
+    .min(0.01, 'Quantity must be greater than 0')
+    .optional(),
+  bulkTotalPaid: z
+    .number({ message: 'Total paid must be a number' })
+    .min(0, 'Total paid must be 0 or greater')
+    .optional(),
   supplier: z
     .string()
     .max(100, 'Supplier name must be less than 100 characters')
@@ -74,7 +89,26 @@ export const materialSchema = z.object({
     .or(z.literal('')),
 });
 
-export type MaterialFormValues = z.infer<typeof materialSchema>;
+// Export the type from the base schema
+export type MaterialFormValues = z.infer<typeof baseMaterialSchema>;
+
+// Validation schema with refinement
+export const materialSchema = baseMaterialSchema.refine(
+  (data) => {
+    // If bulk purchase mode, require both quantity and total paid
+    if (data.costEntryMode === 'bulk_purchase') {
+      return data.bulkQuantity !== undefined &&
+             data.bulkQuantity > 0 &&
+             data.bulkTotalPaid !== undefined &&
+             data.bulkTotalPaid >= 0;
+    }
+    return true;
+  },
+  {
+    message: 'Both quantity and total paid are required for bulk purchase',
+    path: ['bulkQuantity'],
+  }
+);
 
 // Transform form values to Firestore input
 export function transformMaterialFormToInput(values: MaterialFormValues) {

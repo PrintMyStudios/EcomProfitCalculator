@@ -5,12 +5,12 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from '@/components/ui/sheet';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import {
   Select,
   SelectContent,
@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { MaterialForm } from '@/components/materials/material-form';
+import { MaterialForm, type QuickSupplierData } from '@/components/materials/material-form';
 import { MaterialCard } from '@/components/materials/material-card';
 import { useMaterials } from '@/hooks/use-materials';
 import { useSuppliers } from '@/hooks/use-suppliers';
@@ -26,6 +26,7 @@ import { transformMaterialFormToInput, MATERIAL_CATEGORIES, type MaterialFormVal
 import { transformLinkFormToInput, type MaterialSupplierLinkFormValues } from '@/lib/validations/material-supplier-link';
 import type { Material, StockStatus } from '@/types';
 import { Plus, Search, Star, Package } from 'lucide-react';
+import { MaterialsPageSkeleton } from '@/components/skeletons';
 
 export default function MaterialsPage() {
   const {
@@ -40,9 +41,9 @@ export default function MaterialsPage() {
     updateLinkStockStatus,
   } = useMaterials();
 
-  const { materialsSuppliers, loading: suppliersLoading } = useSuppliers();
+  const { suppliers, materialsSuppliers, addSupplier, loading: suppliersLoading } = useSuppliers();
 
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [editingMaterial, setEditingMaterial] = useState<Material | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -103,13 +104,13 @@ export default function MaterialsPage() {
     });
   }, [materials, searchQuery, categoryFilter, showFavouritesOnly, sortBy]);
 
-  const handleOpenSheet = (material?: Material) => {
+  const handleOpenDialog = (material?: Material) => {
     setEditingMaterial(material || null);
-    setSheetOpen(true);
+    setDialogOpen(true);
   };
 
-  const handleCloseSheet = () => {
-    setSheetOpen(false);
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
     setEditingMaterial(null);
   };
 
@@ -124,7 +125,7 @@ export default function MaterialsPage() {
         await addMaterial(input);
         toast.success('Material added');
       }
-      handleCloseSheet();
+      handleCloseDialog();
     } catch (err) {
       console.error('Failed to save material:', err);
       toast.error('Failed to save material', {
@@ -181,6 +182,26 @@ export default function MaterialsPage() {
     }
   };
 
+  // Quick-add supplier from material form
+  const handleQuickAddSupplier = async (data: QuickSupplierData): Promise<string> => {
+    try {
+      const supplierId = await addSupplier({
+        name: data.name,
+        supplierType: 'materials',
+        currency: data.currency,
+        website: data.website,
+      });
+      toast.success('Supplier added');
+      return supplierId;
+    } catch (err) {
+      console.error('Failed to add supplier:', err);
+      toast.error('Failed to add supplier', {
+        description: err instanceof Error ? err.message : 'Please try again',
+      });
+      throw err;
+    }
+  };
+
   // Get unique categories from materials for filter
   const usedCategories = useMemo(() => {
     const cats = new Set(materials.map((m) => m.category).filter(Boolean));
@@ -188,14 +209,7 @@ export default function MaterialsPage() {
   }, [materials]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="flex flex-col items-center gap-2">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-sm text-muted-foreground">Loading materials...</p>
-        </div>
-      </div>
-    );
+    return <MaterialsPageSkeleton />;
   }
 
   if (error) {
@@ -219,7 +233,7 @@ export default function MaterialsPage() {
             Manage the materials you use to make your products
           </p>
         </div>
-        <Button onClick={() => handleOpenSheet()}>
+        <Button onClick={() => handleOpenDialog()}>
           <Plus className="w-4 h-4 mr-2" />
           Add Material
         </Button>
@@ -282,7 +296,7 @@ export default function MaterialsPage() {
 
       {/* Materials grid or empty state */}
       {materials.length === 0 ? (
-        <EmptyState onAddMaterial={() => handleOpenSheet()} />
+        <EmptyState onAddMaterial={() => handleOpenDialog()} />
       ) : filteredMaterials.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-muted-foreground">No materials match your filters</p>
@@ -305,7 +319,7 @@ export default function MaterialsPage() {
               key={material.id}
               material={material}
               suppliers={materialsSuppliers}
-              onEdit={handleOpenSheet}
+              onEdit={handleOpenDialog}
               onDelete={handleDelete}
               onToggleFavourite={handleToggleFavourite}
               onAddSupplierLink={handleAddSupplierLink}
@@ -315,41 +329,43 @@ export default function MaterialsPage() {
         </div>
       )}
 
-      {/* Add/Edit Sheet */}
-      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetContent className="sm:max-w-lg overflow-y-auto p-0">
+      {/* Add/Edit Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto p-0">
           {/* Header with gradient accent */}
           <div className="relative border-b bg-gradient-to-r from-emerald-500/5 to-green-500/5">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-green-600" />
-            <SheetHeader className="p-6 pb-4">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-green-600 rounded-t-lg" />
+            <DialogHeader className="p-6 pb-4">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500/20 to-green-500/20">
                   <Package className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <div>
-                  <SheetTitle className="text-lg">
+                  <DialogTitle className="text-lg">
                     {editingMaterial ? 'Edit Material' : 'Add Material'}
-                  </SheetTitle>
-                  <SheetDescription>
+                  </DialogTitle>
+                  <DialogDescription>
                     {editingMaterial
                       ? 'Update the details of this material'
                       : 'Add a new material to your library'}
-                  </SheetDescription>
+                  </DialogDescription>
                 </div>
               </div>
-            </SheetHeader>
+            </DialogHeader>
           </div>
           {/* Form content with proper padding */}
-          <div className="p-6">
+          <div className="p-6 pt-4">
             <MaterialForm
               material={editingMaterial || undefined}
+              suppliers={suppliers}
               onSubmit={handleSubmit}
-              onCancel={handleCloseSheet}
+              onCancel={handleCloseDialog}
+              onAddSupplier={handleQuickAddSupplier}
               isSubmitting={isSubmitting}
             />
           </div>
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

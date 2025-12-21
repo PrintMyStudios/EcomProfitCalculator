@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { toast } from 'sonner';
+import confetti from 'canvas-confetti';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/components/auth/auth-provider';
 import { Button } from '@/components/ui/button';
@@ -157,11 +158,22 @@ export default function OnboardingPage() {
       // Refresh the user profile in context
       await refreshUserProfile();
 
+      // Celebration confetti
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+      });
+
       // Show success toast and redirect to dashboard
       toast.success('Setup complete!', {
         description: "Let's start calculating your profits",
       });
-      router.push('/dashboard');
+
+      // Small delay to let the confetti be visible
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 1000);
     } catch (err) {
       console.error('Error saving profile:', err);
       setError('Failed to save your profile. Please try again.');

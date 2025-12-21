@@ -36,12 +36,13 @@ src/
 │       ├── layout.tsx        # App shell with nav
 │       ├── dashboard/
 │       ├── calculator/
-│       ├── materials/        # Maker mode only
 │       ├── products/
-│       ├── suppliers/        # Dropship mode only
+│       ├── bundles/          # Multiple products sold together
+│       ├── materials/        # Maker mode only
+│       ├── suppliers/
+│       ├── history/          # Saved calculations
 │       ├── shipping/
 │       ├── platforms/
-│       ├── history/
 │       └── settings/
 ├── components/
 │   ├── ui/                   # shadcn/ui primitives

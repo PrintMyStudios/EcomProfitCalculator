@@ -238,6 +238,28 @@ export function isSourcedProduct(product: Product): product is SourcedProduct {
   return product.productType === 'sourced';
 }
 
+// ============================================
+// Bundles (Multiple products sold together)
+// ============================================
+
+export interface Bundle {
+  id: string;
+  userId: string;
+  name: string;
+  description?: string;
+  productIds: string[]; // References to Product IDs
+  // Cost is auto-calculated from products
+  calculatedCost: number; // Sum of product costs, in minor units
+  // Optional suggested price for the bundle
+  suggestedPrice?: number; // in minor units
+  // Meta
+  isFavourite: boolean;
+  tags?: string[];
+  notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 // Shipping Templates
 export interface ShippingTemplate {
   id: string;

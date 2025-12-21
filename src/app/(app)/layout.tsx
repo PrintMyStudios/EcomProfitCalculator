@@ -68,10 +68,23 @@ const ClockIcon = () => (
   </svg>
 );
 
+const HistoryIcon = () => (
+  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12a9 9 0 019-9M3 12l3 3m-3-3l3-3" />
+  </svg>
+);
+
 const SettingsIcon = () => (
   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+  </svg>
+);
+
+const GiftIcon = () => (
+  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
   </svg>
 );
 
@@ -89,8 +102,10 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
     { href: '/dashboard', label: 'Dashboard', icon: HomeIcon, show: true },
     { href: '/calculator', label: 'Calculator', icon: CalculatorIcon, show: true },
     { href: '/products', label: 'Products', icon: BoxIcon, show: true },
+    { href: '/bundles', label: 'Bundles', icon: GiftIcon, show: true },
     { href: '/materials', label: 'Materials', icon: LayersIcon, show: showMaterialsLibrary },
     { href: '/suppliers', label: 'Suppliers', icon: UsersIcon, show: showSuppliers },
+    { href: '/history', label: 'Calculations', icon: HistoryIcon, show: true },
     { href: '/shipping', label: 'Shipping', icon: TruckIcon, show: true },
     { href: '/time-tracking', label: 'Time', icon: ClockIcon, show: showTimeTracking },
     { href: '/settings', label: 'Settings', icon: SettingsIcon, show: true },
