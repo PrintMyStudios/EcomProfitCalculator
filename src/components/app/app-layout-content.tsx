@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { AuthProvider, useAuth } from '@/components/auth/auth-provider';
@@ -111,7 +111,8 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
     { href: '/settings', label: 'Settings', icon: SettingsIcon, show: true },
   ].filter((item) => item.show);
 
-  const NavLinks = ({ onClick }: { onClick?: () => void }) => (
+  // Render nav links - extracted to avoid creating component during render
+  const renderNavLinks = useCallback((onClick?: () => void) => (
     <nav className="space-y-1">
       {navItems.map((item) => {
         const isActive = pathname === item.href;
@@ -132,7 +133,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
         );
       })}
     </nav>
-  );
+  ), [navItems, pathname]);
 
   const content = (
     <div className="flex min-h-screen">
@@ -145,7 +146,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
           <div className="flex-1 overflow-auto p-4">
-            <NavLinks />
+            {renderNavLinks()}
           </div>
         </div>
       </aside>
@@ -168,7 +169,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
                 </span>
               </div>
               <div className="p-4">
-                <NavLinks onClick={() => setMobileMenuOpen(false)} />
+                {renderNavLinks(() => setMobileMenuOpen(false))}
               </div>
             </SheetContent>
           </Sheet>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, Suspense } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { useAuth } from '@/components/auth/auth-provider';
@@ -415,8 +415,8 @@ function CalculatorContent() {
   // Payment Method (new feature)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('platform_included');
 
-  // VAT Override
-  const [vatRegistered, setVatRegistered] = useState(defaultVatRegistered);
+  // VAT Override (setter unused - VAT status comes from user settings)
+  const [vatRegistered] = useState(defaultVatRegistered);
 
   // Target Settings
   const [targetMargin, setTargetMargin] = useState<string>(defaultTargetMargin.toString());
@@ -425,10 +425,16 @@ function CalculatorContent() {
   // Fees panel collapsed
   const [feesExpanded, setFeesExpanded] = useState(false);
 
+  // Track which product has been loaded to avoid re-loading
+  const loadedProductIdRef = useRef<string | null>(null);
+
   // Load product data when linked product is available
+  // Using ref-based tracking to avoid React Compiler cascading render warning
   useEffect(() => {
-    if (linkedProduct && !hasLoadedProduct) {
+    if (linkedProduct && loadedProductIdRef.current !== linkedProduct.id) {
+      loadedProductIdRef.current = linkedProduct.id;
       const costInMajor = toMajorUnits(linkedProduct.calculatedCost, currency);
+      // Single combined update using callback form
       setManualCost(costInMajor.toFixed(2));
       setCostMode('manual');
       setHasLoadedProduct(true);
@@ -436,10 +442,11 @@ function CalculatorContent() {
         description: `Product cost: ${formatCurrency(linkedProduct.calculatedCost, currency)}`,
       });
     }
-  }, [linkedProduct, hasLoadedProduct, currency]);
+  }, [linkedProduct, currency]);
 
   // Clear linked product
   const clearLinkedProduct = () => {
+    loadedProductIdRef.current = null;
     setHasLoadedProduct(false);
     // Clear URL param by navigating without it
     window.history.replaceState(null, '', '/calculator');
@@ -518,16 +525,61 @@ function CalculatorContent() {
     });
   }, [salePriceMinor, shippingCostMinor, freeShipping, productCost, totalFees, vatRate, vatRegistered]);
 
+  // Etsy Offsite Ads calculation (only for Etsy platform)
+  // 15% for shops under $10k/year, 12% for shops over $10k/year (mandatory)
+  const etsyOffsiteAds = useMemo(() => {
+    if (selectedPlatform !== 'etsy' || !salePriceMinor) return null;
+
+    const OFFSITE_ADS_RATE_STANDARD = 15; // Under $10k
+    const OFFSITE_ADS_RATE_DISCOUNTED = 12; // Over $10k (mandatory)
+
+    // Offsite Ads fee is charged on order total (item + shipping)
+    const orderTotal = salePriceMinor + shippingCostMinor;
+    const feeStandard = Math.round(orderTotal * (OFFSITE_ADS_RATE_STANDARD / 100));
+    const feeDiscounted = Math.round(orderTotal * (OFFSITE_ADS_RATE_DISCOUNTED / 100));
+
+    const revenue = salePriceMinor + (freeShipping ? shippingCostMinor : 0);
+
+    // Profit with Offsite Ads (standard 15%)
+    const { profit: profitWithStandard, margin: marginWithStandard } = calculateProfit({
+      revenue,
+      productCost,
+      platformFees: totalFees + feeStandard,
+      vatRate,
+      isVatRegistered: vatRegistered,
+    });
+
+    // Profit with Offsite Ads (discounted 12%)
+    const { profit: profitWithDiscounted, margin: marginWithDiscounted } = calculateProfit({
+      revenue,
+      productCost,
+      platformFees: totalFees + feeDiscounted,
+      vatRate,
+      isVatRegistered: vatRegistered,
+    });
+
+    return {
+      feeStandard,
+      feeDiscounted,
+      profitWithStandard,
+      marginWithStandard,
+      profitWithDiscounted,
+      marginWithDiscounted,
+      isProfitableWithStandard: profitWithStandard > 0,
+      isProfitableWithDiscounted: profitWithDiscounted > 0,
+    };
+  }, [selectedPlatform, salePriceMinor, shippingCostMinor, freeShipping, productCost, totalFees, vatRate, vatRegistered]);
+
   // Calculate profit per hour (for handmade mode)
   const profitPerHour = useMemo(() => {
     if (costMode !== 'handmade' || !labourHours || parseFloat(labourHours) <= 0) return null;
     return profit / parseFloat(labourHours);
   }, [costMode, labourHours, profit]);
 
-  // Apply rounding using proper library
-  const applyRounding = (price: number): number => {
+  // Apply rounding using proper library - memoized to avoid dependency issues
+  const applyRounding = useCallback((price: number): number => {
     return roundPrice(price, { mode: roundingMode });
-  };
+  }, [roundingMode]);
 
   // Calculate break-even price
   const breakEvenPrice = useMemo(() => {
@@ -543,7 +595,7 @@ function CalculatorContent() {
     });
 
     return applyRounding(price);
-  }, [productCost, shippingCostMinor, freeShipping, platformTemplate.fees, vatRate, vatRegistered, roundingMode]);
+  }, [productCost, shippingCostMinor, freeShipping, platformTemplate.fees, vatRate, vatRegistered, applyRounding]);
 
   // Calculate target price
   const targetPriceValue = useMemo(() => {
@@ -560,7 +612,7 @@ function CalculatorContent() {
     });
 
     return applyRounding(price);
-  }, [productCost, shippingCostMinor, freeShipping, platformTemplate.fees, vatRate, vatRegistered, targetMargin, roundingMode]);
+  }, [productCost, shippingCostMinor, freeShipping, platformTemplate.fees, vatRate, vatRegistered, targetMargin, applyRounding]);
 
   // Find best platform for compare view
   const bestPlatform = useMemo(() => {
@@ -1361,6 +1413,74 @@ function CalculatorContent() {
                   <span className="text-muted-foreground">Receipts (ex-VAT):</span>{' '}
                   <span className="font-semibold">{formatCurrency(receiptsExVat, currency)}</span>
                 </div>
+              )}
+
+              {/* Etsy Offsite Ads Section */}
+              {etsyOffsiteAds && (
+                <>
+                  <Separator />
+                  <div>
+                    <h4 className="mb-1 flex items-center gap-2 text-sm font-semibold">
+                      <svg className="h-4 w-4 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                      </svg>
+                      If Sold via Offsite Ads
+                    </h4>
+                    <p className="px-2 mb-3 text-xs text-muted-foreground">
+                      Etsy promotes on Google, Facebook, etc. Only pay if it results in a sale.
+                    </p>
+
+                    <div className="space-y-3 rounded-lg bg-muted/50 p-3">
+                      {/* 15% Rate (Under $10k) */}
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">
+                            15% fee <span className="text-xs">(under $10k/yr)</span>
+                          </span>
+                          <span className="font-medium text-orange-600 dark:text-orange-400">
+                            -{formatCurrency(etsyOffsiteAds.feeStandard, currency)}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">Profit with Offsite Ads</span>
+                          <span className={`text-sm font-semibold ${etsyOffsiteAds.isProfitableWithStandard ? 'text-emerald-500' : 'text-red-500'}`}>
+                            {formatCurrency(etsyOffsiteAds.profitWithStandard, currency)}
+                            <span className="ml-1 text-xs font-normal">({etsyOffsiteAds.marginWithStandard.toFixed(1)}%)</span>
+                          </span>
+                        </div>
+                      </div>
+
+                      <Separator className="my-2" />
+
+                      {/* 12% Rate (Over $10k - Mandatory) */}
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">
+                            12% fee <span className="text-xs">(over $10k/yr)</span>
+                          </span>
+                          <span className="font-medium text-orange-600 dark:text-orange-400">
+                            -{formatCurrency(etsyOffsiteAds.feeDiscounted, currency)}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">Profit with Offsite Ads</span>
+                          <span className={`text-sm font-semibold ${etsyOffsiteAds.isProfitableWithDiscounted ? 'text-emerald-500' : 'text-red-500'}`}>
+                            {formatCurrency(etsyOffsiteAds.profitWithDiscounted, currency)}
+                            <span className="ml-1 text-xs font-normal">({etsyOffsiteAds.marginWithDiscounted.toFixed(1)}%)</span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Info box about mandatory participation */}
+                    <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-2 dark:border-amber-900 dark:bg-amber-950/50">
+                      <p className="text-xs text-amber-800 dark:text-amber-200">
+                        <strong>Note:</strong> Shops over $10k/yr <strong>cannot opt out</strong>. ~10-15% of sales come through Offsite Ads.
+                      </p>
+                    </div>
+                  </div>
+                </>
               )}
 
               <Separator />

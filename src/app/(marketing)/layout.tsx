@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: {
@@ -21,9 +22,9 @@ export default function MarketingLayout({
         {/* Gradient accent line */}
         <div className="h-0.5 bg-gradient-to-r from-emerald-500 via-blue-500 to-purple-500" />
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <a href="/" className="text-xl font-bold">
+          <Link href="/" className="text-xl font-bold">
             EcomProfit<span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">Calculator</span>
-          </a>
+          </Link>
           <nav className="flex items-center gap-4">
             <a
               href="/calculators/etsy-fee-calculator"
@@ -45,9 +46,9 @@ export default function MarketingLayout({
       <footer className="border-t bg-muted/30 py-12">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center gap-4">
-            <a href="/" className="text-lg font-bold">
+            <Link href="/" className="text-lg font-bold">
               EcomProfit<span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">Calculator</span>
-            </a>
+            </Link>
             <p className="text-sm text-muted-foreground text-center max-w-md">
               Free profit calculators for indie sellers. Know your margins before you list.
             </p>
