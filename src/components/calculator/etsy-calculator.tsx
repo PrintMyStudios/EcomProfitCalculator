@@ -60,17 +60,18 @@ export function EtsyCalculator() {
       isVatRegistered,
     });
 
-    // Calculate Offsite Ads fees (charged on item price only, not shipping)
+    // Calculate Offsite Ads fees (charged on order total: item + shipping)
     // Standard rate (15%) for shops under $10k/year
-    const offsiteAdsFeeSstandard = Math.round(salePriceMinor * (OFFSITE_ADS_RATE_STANDARD / 100));
+    const orderTotal = salePriceMinor + shippingCostMinor;
+    const offsiteAdsFeeStandard = Math.round(orderTotal * (OFFSITE_ADS_RATE_STANDARD / 100));
     // Discounted rate (12%) for shops over $10k/year (mandatory)
-    const offsiteAdsFeeDiscounted = Math.round(salePriceMinor * (OFFSITE_ADS_RATE_DISCOUNTED / 100));
+    const offsiteAdsFeeDiscounted = Math.round(orderTotal * (OFFSITE_ADS_RATE_DISCOUNTED / 100));
 
     // Profit with Offsite Ads (standard 15%)
     const { profit: profitWithOffsiteAdsStandard, margin: marginWithOffsiteAdsStandard } = calculateProfit({
       revenue,
       productCost: totalProductCost,
-      platformFees: totalFees + offsiteAdsFeeSstandard,
+      platformFees: totalFees + offsiteAdsFeeStandard,
       vatRate,
       isVatRegistered,
     });
@@ -112,7 +113,7 @@ export function EtsyCalculator() {
       isProfit: profit > 0,
       // Offsite Ads data
       offsiteAds: {
-        feeStandard: offsiteAdsFeeSstandard,
+        feeStandard: offsiteAdsFeeStandard,
         feeDiscounted: offsiteAdsFeeDiscounted,
         profitWithStandard: profitWithOffsiteAdsStandard,
         marginWithStandard: marginWithOffsiteAdsStandard,

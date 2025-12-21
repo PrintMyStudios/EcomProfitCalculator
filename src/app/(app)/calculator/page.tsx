@@ -526,9 +526,10 @@ function CalculatorContent() {
     const OFFSITE_ADS_RATE_STANDARD = 15; // Under $10k
     const OFFSITE_ADS_RATE_DISCOUNTED = 12; // Over $10k (mandatory)
 
-    // Offsite Ads fee is charged on item price only
-    const feeStandard = Math.round(salePriceMinor * (OFFSITE_ADS_RATE_STANDARD / 100));
-    const feeDiscounted = Math.round(salePriceMinor * (OFFSITE_ADS_RATE_DISCOUNTED / 100));
+    // Offsite Ads fee is charged on order total (item + shipping)
+    const orderTotal = salePriceMinor + shippingCostMinor;
+    const feeStandard = Math.round(orderTotal * (OFFSITE_ADS_RATE_STANDARD / 100));
+    const feeDiscounted = Math.round(orderTotal * (OFFSITE_ADS_RATE_DISCOUNTED / 100));
 
     const revenue = salePriceMinor + (freeShipping ? shippingCostMinor : 0);
 
@@ -1412,18 +1413,13 @@ function CalculatorContent() {
                 <>
                   <Separator />
                   <div>
-                    <button
-                      onClick={() => {}}
-                      className="flex w-full items-center justify-between rounded-lg p-2 text-sm font-semibold"
-                    >
-                      <span className="flex items-center gap-2">
-                        <svg className="h-4 w-4 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
-                        </svg>
-                        If Sold via Offsite Ads
-                      </span>
-                    </button>
+                    <h4 className="mb-1 flex items-center gap-2 text-sm font-semibold">
+                      <svg className="h-4 w-4 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                      </svg>
+                      If Sold via Offsite Ads
+                    </h4>
                     <p className="px-2 mb-3 text-xs text-muted-foreground">
                       Etsy promotes on Google, Facebook, etc. Only pay if it results in a sale.
                     </p>
