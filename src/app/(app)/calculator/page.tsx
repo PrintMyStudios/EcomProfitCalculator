@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, Suspense } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { useAuth } from '@/components/auth/auth-provider';
@@ -415,8 +415,8 @@ function CalculatorContent() {
   // Payment Method (new feature)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('platform_included');
 
-  // VAT Override
-  const [vatRegistered, setVatRegistered] = useState(defaultVatRegistered);
+  // VAT Override (setter unused - VAT status comes from user settings)
+  const [vatRegistered] = useState(defaultVatRegistered);
 
   // Target Settings
   const [targetMargin, setTargetMargin] = useState<string>(defaultTargetMargin.toString());
@@ -425,10 +425,16 @@ function CalculatorContent() {
   // Fees panel collapsed
   const [feesExpanded, setFeesExpanded] = useState(false);
 
+  // Track which product has been loaded to avoid re-loading
+  const loadedProductIdRef = useRef<string | null>(null);
+
   // Load product data when linked product is available
+  // Using ref-based tracking to avoid React Compiler cascading render warning
   useEffect(() => {
-    if (linkedProduct && !hasLoadedProduct) {
+    if (linkedProduct && loadedProductIdRef.current !== linkedProduct.id) {
+      loadedProductIdRef.current = linkedProduct.id;
       const costInMajor = toMajorUnits(linkedProduct.calculatedCost, currency);
+      // Single combined update using callback form
       setManualCost(costInMajor.toFixed(2));
       setCostMode('manual');
       setHasLoadedProduct(true);
@@ -436,10 +442,11 @@ function CalculatorContent() {
         description: `Product cost: ${formatCurrency(linkedProduct.calculatedCost, currency)}`,
       });
     }
-  }, [linkedProduct, hasLoadedProduct, currency]);
+  }, [linkedProduct, currency]);
 
   // Clear linked product
   const clearLinkedProduct = () => {
+    loadedProductIdRef.current = null;
     setHasLoadedProduct(false);
     // Clear URL param by navigating without it
     window.history.replaceState(null, '', '/calculator');
@@ -569,10 +576,10 @@ function CalculatorContent() {
     return profit / parseFloat(labourHours);
   }, [costMode, labourHours, profit]);
 
-  // Apply rounding using proper library
-  const applyRounding = (price: number): number => {
+  // Apply rounding using proper library - memoized to avoid dependency issues
+  const applyRounding = useCallback((price: number): number => {
     return roundPrice(price, { mode: roundingMode });
-  };
+  }, [roundingMode]);
 
   // Calculate break-even price
   const breakEvenPrice = useMemo(() => {
@@ -588,7 +595,7 @@ function CalculatorContent() {
     });
 
     return applyRounding(price);
-  }, [productCost, shippingCostMinor, freeShipping, platformTemplate.fees, vatRate, vatRegistered, roundingMode]);
+  }, [productCost, shippingCostMinor, freeShipping, platformTemplate.fees, vatRate, vatRegistered, applyRounding]);
 
   // Calculate target price
   const targetPriceValue = useMemo(() => {
@@ -605,7 +612,7 @@ function CalculatorContent() {
     });
 
     return applyRounding(price);
-  }, [productCost, shippingCostMinor, freeShipping, platformTemplate.fees, vatRate, vatRegistered, targetMargin, roundingMode]);
+  }, [productCost, shippingCostMinor, freeShipping, platformTemplate.fees, vatRate, vatRegistered, targetMargin, applyRounding]);
 
   // Find best platform for compare view
   const bestPlatform = useMemo(() => {
